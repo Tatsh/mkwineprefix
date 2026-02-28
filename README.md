@@ -29,20 +29,53 @@
 
 Create a Wine prefix with custom settings.
 
-Use with eval: `eval $(mkwineprefix ...)`
+Use with eval: `eval $(mkwineprefix ...)`.
 
 ## Installation
 
 ```bash
-poetry install
-# or
 pip install mkwineprefix
 ```
 
 ## Usage
 
-```bash
-mkwineprefix PREFIX_NAME [OPTIONS]
+Invoke with `mkwineprefix` or `python -m mkwineprefix`.
+
+```plain
+Usage: mkwineprefix [OPTIONS] PREFIX_NAME
+
+  Create a Wine prefix with custom settings.
+
+  This should be used with eval: eval $(mkwineprefix ...)
+
+Options:
+  -D, --dpi INTEGER               DPI.
+  -d, --debug                     Enable debug output.
+  --disable-explorer              Disable starting explorer.exe automatically.
+  --disable-services              Disable starting services.exe automatically
+                                  (only useful for simple CLI programs with
+                                  --disable-explorer).
+  -E, --eax                       Enable EAX.
+  -g, --gtk                       Enable Gtk+ theming.
+  -r, --prefix-root PATH          Prefix root.
+  -S, --sandbox                   Sandbox the prefix.
+  --no-gecko                      Disable downloading Gecko automatically.
+  --no-mono                       Disable downloading Mono automatically.
+  --no-xdg                        Disable winemenubuilder.exe.
+  --no-assocs                     Disable creating file associations, but
+                                  still allow menu entries to be made (unless
+                                  --no-xdg is also passed).
+  -N, --nvapi                     Add dxvk-nvapi.
+  -o, --noto                      Use Noto Sans in place of most fonts.
+  -T, --trick TEXT                Add an argument for winetricks.
+  -t, --tmpfs                     Make Wine use tmpfs.
+  -V, --windows-version [11|10|vista|2k3|7|8|xp|81|2k|98|95]
+                                  Windows version.
+  --vd SIZE                       Virtual desktop size, e.g. 1024x768.
+  -W, --winrt-dark                Enable dark mode for WinRT apps.
+  -x, --dxva-vaapi                Enable DXVA2 support with VA-API.
+  --32                            Use 32-bit prefix.
+  -h, --help                      Show this message and exit.
 ```
 
 Run `mkwineprefix --help` for options.
