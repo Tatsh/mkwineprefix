@@ -90,7 +90,7 @@ Commands
 
 .. only:: html
 
-   .. automodule:: mkwineprefix.utils
+   .. automodule:: mkwineprefix.prefix
       :members:
 
    Indices and tables
