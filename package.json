@@ -47,7 +47,7 @@
   },
   "files": ["LICENSE.txt", "README.md", "man/mkwineprefix.1"],
   "homepage": "https://tatsh.github.io/mkwineprefix/",
-  "keywords": ["command line", "wine", "wineprefix"],
+  "keywords": ["command line", "dxvk", "nvapi", "wine", "wine-prefix"],
   "license": "MIT",
   "markdownlint-cli2": {
     "config": {

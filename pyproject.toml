@@ -16,7 +16,7 @@ classifiers = [
 ]
 description = "Create a Wine prefix with custom settings."
 dynamic = ["dependencies", "requires-python"]
-keywords = ["command line", "wine", "wineprefix"]
+keywords = ["command line", "dxvk", "nvapi", "wine", "wine-prefix"]
 license = "MIT"
 name = "mkwineprefix"
 readme = "README.md"

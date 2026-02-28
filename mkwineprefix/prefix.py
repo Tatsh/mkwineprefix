@@ -51,7 +51,6 @@ def _run_cmd(cmd: tuple[str, ...], env: dict[str, str] | None = None) -> None:
     sp.run(cmd, env=env, check=True)
 
 
-
 WineWindowsVersion = Literal['11', '10', 'vista', '2k3', '7', '8', 'xp', '81', '2k', '98', '95']
 """Windows versions supported by Wine."""
 DEFAULT_DPI = 96
@@ -260,12 +259,10 @@ def _setup_tmpfs(target: Path) -> None:
     username = environ.get('USER', environ.get('USERNAME', 'user'))
     rmtree(target / f'drive_c/users/{username}/Temp', ignore_errors=True)
     rmtree(target / 'drive_c/windows/temp', ignore_errors=True)
-    Path(target / f'drive_c/users/{username}/Temp').symlink_to(
-        tempfile.gettempdir(), target_is_directory=True
-    )
-    Path(target / 'drive_c/windows/temp').symlink_to(
-        tempfile.gettempdir(), target_is_directory=True
-    )
+    Path(target / f'drive_c/users/{username}/Temp').symlink_to(tempfile.gettempdir(),
+                                                               target_is_directory=True)
+    Path(target / 'drive_c/windows/temp').symlink_to(tempfile.gettempdir(),
+                                                     target_is_directory=True)
 
 
 def _run_winetricks(
@@ -311,12 +308,12 @@ def _setup_dxvk_nvapi(target: Path, env: dict[str, str], *, _32bit: bool = False
             tar.extract(member, target / 'drive_c' / 'windows' / 'syswow64')
         if not _32bit:
             for item in (
-                'nvcuda',
-                'nvoptix',
-                'nvcuvid',
-                'nvencodeapi64',
-                'nvapi64',
-                'nvofapi64',
+                    'nvcuda',
+                    'nvoptix',
+                    'nvcuvid',
+                    'nvencodeapi64',
+                    'nvapi64',
+                    'nvofapi64',
             ):
                 _run_reg(
                     env,
@@ -404,11 +401,9 @@ def _add_q4wine_prefix(prefix_name: str, target: Path) -> None:
     if not db_path.exists():
         return
     log.debug('Adding this prefix to Q4Wine.')
-    run_string = (
-        r'%CONSOLE_BIN% %CONSOLE_ARGS% %ENV_BIN% %ENV_ARGS% /bin/sh -c '
-        r'"%WORK_DIR% %SET_NICE% %WINE_BIN% %VIRTUAL_DESKTOP% %PROGRAM_BIN% '
-        r'%PROGRAM_ARGS% 2>&1 "'
-    )
+    run_string = (r'%CONSOLE_BIN% %CONSOLE_ARGS% %ENV_BIN% %ENV_ARGS% /bin/sh -c '
+                  r'"%WORK_DIR% %SET_NICE% %WINE_BIN% %VIRTUAL_DESKTOP% %PROGRAM_BIN% '
+                  r'%PROGRAM_ARGS% 2>&1 "')
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
         c.execute(
@@ -530,15 +525,9 @@ def create_wine_prefix(  # noqa: PLR0913
     ------
     FileExistsError
     """
-    tricks_list = list(
-        (
-            t
-            for t in tricks
-            if t not in WINETRICKS_VERSION_MAPPING.values() and not t.startswith('vd=')
-        )
-        if tricks
-        else []
-    )
+    tricks_list = list((t for t in tricks
+                        if t not in WINETRICKS_VERSION_MAPPING.values() and not t.startswith('vd=')
+                        ) if tricks else [])
     root = Path(prefix_root) if prefix_root else Path.home() / '.local/share/wineprefixes'
     root.mkdir(parents=True, exist_ok=True)
     target = root / prefix_name
@@ -546,8 +535,7 @@ def create_wine_prefix(  # noqa: PLR0913
         raise FileExistsError
     if 'DISPLAY' not in environ or 'XAUTHORITY' not in environ:
         log.warning(
-            'Wine will likely fail to run since DISPLAY or XAUTHORITY are not in the environment.'
-        )
+            'Wine will likely fail to run since DISPLAY or XAUTHORITY are not in the environment.')
     env = _build_prefix_env(target, _32bit=_32bit)
     _run_cmd(('wineboot', '--init'), env)
     _run_cmd(('wineserver', '-w'), env)
@@ -570,9 +558,7 @@ def create_wine_prefix(  # noqa: PLR0913
     if dxvk_nvapi:
         tricks_list.append('dxvk')
     try:
-        _run_winetricks(
-            prefix_name, tricks_list, windows_version, sandbox=sandbox, vd=vd
-        )
+        _run_winetricks(prefix_name, tricks_list, windows_version, sandbox=sandbox, vd=vd)
     except sp.CalledProcessError as e:  # pragma: no cover
         log.warning('Winetricks exit code was %d but it may have succeeded.', e.returncode)
     if dxvk_nvapi:
