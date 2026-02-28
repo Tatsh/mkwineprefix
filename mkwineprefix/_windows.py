@@ -1,4 +1,4 @@
-"""Windows font/registry constants used by create_wine_prefix."""
+"""Windows font/registry constants used by ``create_wine_prefix``."""
 
 from __future__ import annotations
 

@@ -11,11 +11,10 @@ import sys
 from bascom import setup_logging
 import click
 
-from .constants import CONTEXT_SETTINGS
 from .prefix import DEFAULT_DPI, WineWindowsVersion, create_wine_prefix
 
 
-@click.command(context_settings=CONTEXT_SETTINGS)
+@click.command(context_settings={'help_option_names': ('-h', '--help')})
 @click.argument('prefix_name')
 @click.option('-D', '--dpi', default=DEFAULT_DPI, type=int, help='DPI.')
 @click.option('-d', '--debug', is_flag=True, help='Enable debug output.')
