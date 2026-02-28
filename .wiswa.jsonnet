@@ -4,7 +4,7 @@ local utils = import 'utils.libjsonnet';
   description: 'Create a Wine prefix with custom settings.',
   keywords: ['command line', 'dxvk', 'nvapi', 'wine', 'wine-prefix'],
   project_name: 'mkwineprefix',
-  version: '0.0.0',
+  version: '0.0.1',
   want_main: true,
   pyproject+: {
     tool+: {
