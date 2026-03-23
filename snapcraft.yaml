@@ -7,12 +7,19 @@ apps:
       - 'network-bind'
 base: 'core24'
 confinement: 'strict'
+contact: 'https://github.com/Tatsh/mkwineprefix/issues'
 description: 'Create a Wine prefix with custom settings.'
+donation: 'https://buymeacoffee.com/Tatsh'
 grade: 'stable'
+issues: 'https://github.com/Tatsh/mkwineprefix/issues'
+license: 'MIT'
 name: 'mkwineprefix'
 parts:
   mkwineprefix:
-    plugin: 'poetry'
+    build-packages: []
+    plugin: 'python'
+    python-packages:
+      - '.'
     source: '.'
     stage-packages: []
 platforms:
@@ -20,5 +27,8 @@ platforms:
     build-on: 'amd64'
   arm64:
     build-on: 'arm64'
+source-code: 'https://github.com/Tatsh/mkwineprefix'
 summary: 'Create a Wine prefix with custom settings.'
-version: '0.0.0'
+title: 'mkwineprefix'
+version: '0.0.1'
+website: 'https://tatsh.github.io/mkwineprefix/'
