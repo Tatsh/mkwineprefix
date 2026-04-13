@@ -412,8 +412,10 @@ def _add_q4wine_prefix(prefix_name: str, target: Path) -> None:
             (prefix_name, str(target), 'D:', run_string),
         )
         prefix_id = c.lastrowid
+        if prefix_id is None:
+            msg = 'Q4Wine insert did not return a prefix row ID.'
+            raise RuntimeError(msg)
         log.debug('Q4Wine prefix ID: %d', prefix_id)
-        assert prefix_id is not None
         for dir_name in ('system', 'autostart', 'import'):
             c.execute('INSERT INTO dir (name, prefix_id) VALUES (?, ?)', (dir_name, prefix_id))
         for args, exec_, icon_path, desc, folder, display_name in Q4WINE_DEFAULT_ICONS:

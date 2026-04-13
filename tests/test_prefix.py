@@ -237,3 +237,39 @@ def test_create_wine_prefix_asio_true_register_found(mocker: MockerFixture) -> N
     assert any(
         isinstance(args.args[0], tuple) and args.args[0][0] == '/usr/bin/wineasio-register'
         for args in sp_run.call_args_list)
+
+
+def test_create_wine_prefix_q4wine_missing_row_id(mocker: MockerFixture) -> None:
+    mocker.patch('mkwineprefix.prefix.sp.run')
+    mocker.patch('mkwineprefix.prefix.which', return_value=None)
+    mocker.patch('mkwineprefix.prefix.requests.get')
+    mocker.patch('mkwineprefix.prefix.xz.open')
+    mocker.patch('mkwineprefix.prefix.tarfile.TarFile')
+    mocker.patch('mkwineprefix.prefix.copyfile')
+    mock_user_config_path = mocker.patch('mkwineprefix.prefix.platformdirs.user_config_path')
+    mock_db_path = mocker.Mock()
+    mock_db_path.exists.return_value = True
+    mock_user_config_path.return_value.__truediv__.return_value = mock_db_path
+    mock_cursor = mocker.Mock()
+    mock_cursor.lastrowid = None
+    mock_conn = mocker.Mock()
+    mock_conn.cursor.return_value = mock_cursor
+    mock_conn.__enter__ = mocker.Mock(return_value=mock_conn)
+    mock_conn.__exit__ = mocker.Mock(return_value=None)
+    mocker.patch('mkwineprefix.prefix.sqlite3.connect', return_value=mock_conn)
+    mock_path = mocker.patch('mkwineprefix.prefix.Path')
+    mock_path.home.return_value.__truediv__.return_value.__truediv__.return_value.exists.return_value = False  # noqa: E501
+    mocker.patch('mkwineprefix.prefix.rmtree')
+    mocker.patch('mkwineprefix.prefix.tempfile.gettempdir', return_value='/tmp')
+    mocker.patch('mkwineprefix.prefix.struct.pack', return_value=b'\x00' * 92)
+    mocker.patch.dict(
+        'mkwineprefix.prefix.environ',
+        {
+            'PATH': '/bin',
+            'DISPLAY': ':0',
+            'XAUTHORITY': '/tmp/.Xauthority'
+        },
+        clear=True,
+    )
+    with pytest.raises(RuntimeError, match='Q4Wine insert did not return a prefix row ID'):
+        create_wine_prefix('q4wine-bad-id')
