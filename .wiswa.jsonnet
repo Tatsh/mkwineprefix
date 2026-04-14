@@ -13,16 +13,10 @@ local utils = import 'utils.libjsonnet';
     tool+: {
       poetry+: {
         dependencies+: {
+          anyio: utils.latestPypiPackageVersionCaret('anyio'),
+          niquests: utils.latestPypiPackageVersionCaret('niquests'),
           platformdirs: utils.latestPypiPackageVersionCaret('platformdirs'),
           'python-xz': utils.latestPypiPackageVersionCaret('python-xz'),
-          requests: utils.latestPypiPackageVersionCaret('requests'),
-        },
-        group+: {
-          dev+: {
-            dependencies+: {
-              'types-requests': utils.latestPypiPackageVersionCaret('types-requests'),
-            },
-          },
         },
       },
     },

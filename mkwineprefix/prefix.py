@@ -3,12 +3,14 @@
 
 from __future__ import annotations
 
+from functools import partial
 from io import BytesIO
 from os import PathLike, environ
 from pathlib import Path
 from shlex import quote
 from shutil import copyfile, rmtree, which
-from typing import TYPE_CHECKING, Literal, NamedTuple
+from typing import TYPE_CHECKING, Any, Literal, NamedTuple, TypeAlias
+import asyncio
 import logging
 import sqlite3
 import struct
@@ -16,8 +18,10 @@ import subprocess as sp
 import tarfile
 import tempfile
 
+from anyio import Path as AsyncPath
+from anyio.to_thread import run_sync as run_in_thread
+import niquests
 import platformdirs
-import requests
 import xz
 
 from ._windows import (
@@ -32,23 +36,29 @@ from ._windows import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Coroutine, Iterable
 
 __all__ = ('create_wine_prefix',)
 
-StrPath = str | PathLike[str]
+StrPath: TypeAlias = str | PathLike[str]
 log = logging.getLogger(__name__)
 
 
-def _run_reg(env: dict[str, str], *args: str, wine_bin: str = 'wine') -> None:
+async def _run_reg(env: dict[str, str], *args: str, wine_bin: str = 'wine') -> None:
     cmd = (wine_bin, 'reg', 'add', *args)
     log.debug('Running: %s', ' '.join(quote(x) for x in cmd))
-    sp.run(cmd, env=env, check=True)
+    proc = await asyncio.create_subprocess_exec(*cmd, env=env)
+    returncode = await proc.wait()
+    if returncode:
+        raise sp.CalledProcessError(returncode, cmd[0])
 
 
-def _run_cmd(cmd: tuple[str, ...], env: dict[str, str] | None = None) -> None:
+async def _run_cmd(cmd: tuple[str, ...], env: dict[str, str] | None = None) -> None:
     log.debug('Running: %s', ' '.join(quote(x) for x in cmd))
-    sp.run(cmd, env=env, check=True)
+    proc = await asyncio.create_subprocess_exec(*cmd, env=env)
+    returncode = await proc.wait()
+    if returncode:
+        raise sp.CalledProcessError(returncode, cmd[0])
 
 
 WineWindowsVersion = Literal['11', '10', 'vista', '2k3', '7', '8', 'xp', '81', '2k', '98', '95']
@@ -187,7 +197,7 @@ def _build_prefix_env(target: Path, *, _32bit: bool = False) -> dict[str, str]:
     return env
 
 
-def _apply_initial_registry(
+async def _apply_initial_registry(
     env: dict[str, str],
     dpi: int,
     *,
@@ -202,26 +212,29 @@ def _apply_initial_registry(
     disable_explorer: bool = False,
     disable_services: bool = False,
 ) -> None:
+    coros: list[Coroutine[Any, Any, None]] = []
     if dpi != DEFAULT_DPI:
-        _run_reg(
-            env,
-            r'HKCU\Control Panel\Desktop',
-            '/t',
-            'REG_DWORD',
-            '/v',
-            'LogPixels',
-            '/d',
-            str(dpi),
-            '/f',
-        )
+        coros.append(
+            _run_reg(
+                env,
+                r'HKCU\Control Panel\Desktop',
+                '/t',
+                'REG_DWORD',
+                '/v',
+                'LogPixels',
+                '/d',
+                str(dpi),
+                '/f',
+            ))
     if dxva_vaapi:
-        _run_reg(env, r'HKCU\Software\Wine\DXVA2', '/v', 'backend', '/d', 'va', '/f')
+        coros.append(_run_reg(env, r'HKCU\Software\Wine\DXVA2', '/v', 'backend', '/d', 'va', '/f'))
     if eax:
-        _run_reg(env, r'HKCU\Software\Wine\DirectSound', '/v', 'EAXEnabled', '/d', 'Y', '/f')
+        coros.append(
+            _run_reg(env, r'HKCU\Software\Wine\DirectSound', '/v', 'EAXEnabled', '/d', 'Y', '/f'))
     if gtk:
-        _run_reg(env, r'HKCU\Software\Wine', '/v', 'ThemeEngine', '/d', 'GTK', '/f')
+        coros.append(_run_reg(env, r'HKCU\Software\Wine', '/v', 'ThemeEngine', '/d', 'GTK', '/f'))
     if winrt_dark:
-        for k in ('AppsUseLightTheme', 'SystemUsesLightTheme'):
+        coros.extend(
             _run_reg(
                 env,
                 r'HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize',
@@ -232,40 +245,49 @@ def _apply_initial_registry(
                 '/d',
                 '0',
                 '/f',
-            )
+            ) for k in ('AppsUseLightTheme', 'SystemUsesLightTheme'))
     if no_associations:
-        _run_reg(
-            env,
-            r'HKCU\Software\Wine\Explorer\FileAssociations',
-            '/v',
-            'Enable',
-            '/d',
-            'N',
-            '/f',
-        )
+        coros.append(
+            _run_reg(
+                env,
+                r'HKCU\Software\Wine\Explorer\FileAssociations',
+                '/v',
+                'Enable',
+                '/d',
+                'N',
+                '/f',
+            ))
     if no_xdg:
-        _run_reg(env, r'HKCU\Software\Wine\DllOverrides', '/v', 'winemenubuilder.exe', '/f')
+        coros.append(
+            _run_reg(env, r'HKCU\Software\Wine\DllOverrides', '/v', 'winemenubuilder.exe', '/f'))
     if no_mono:
-        _run_reg(env, r'HKCU\Software\Wine\DllOverrides', '/v', 'mscoree', '/f')
+        coros.append(_run_reg(env, r'HKCU\Software\Wine\DllOverrides', '/v', 'mscoree', '/f'))
     if no_gecko:
-        _run_reg(env, r'HKCU\Software\Wine\DllOverrides', '/v', 'mshtml', '/f')
+        coros.append(_run_reg(env, r'HKCU\Software\Wine\DllOverrides', '/v', 'mshtml', '/f'))
     if disable_explorer:
-        _run_reg(env, r'HKCU\Software\Wine\DllOverrides', '/v', 'explorer.exe', '/f')
+        coros.append(_run_reg(env, r'HKCU\Software\Wine\DllOverrides', '/v', 'explorer.exe', '/f'))
     if disable_services:
-        _run_reg(env, r'HKCU\Software\Wine\DllOverrides', '/v', 'services.exe', '/f')
+        coros.append(_run_reg(env, r'HKCU\Software\Wine\DllOverrides', '/v', 'services.exe', '/f'))
+    if coros:
+        await asyncio.gather(*coros)
 
 
-def _setup_tmpfs(target: Path) -> None:
+async def _setup_tmpfs(target: Path) -> None:
     username = environ.get('USER', environ.get('USERNAME', 'user'))
-    rmtree(target / f'drive_c/users/{username}/Temp', ignore_errors=True)
-    rmtree(target / 'drive_c/windows/temp', ignore_errors=True)
-    Path(target / f'drive_c/users/{username}/Temp').symlink_to(tempfile.gettempdir(),
-                                                               target_is_directory=True)
-    Path(target / 'drive_c/windows/temp').symlink_to(tempfile.gettempdir(),
-                                                     target_is_directory=True)
+    user_temp = target / f'drive_c/users/{username}/Temp'
+    win_temp = target / 'drive_c/windows/temp'
+    await asyncio.gather(
+        run_in_thread(partial(rmtree, user_temp, ignore_errors=True)),
+        run_in_thread(partial(rmtree, win_temp, ignore_errors=True)),
+    )
+    tmpdir = tempfile.gettempdir()
+    await asyncio.gather(
+        AsyncPath(user_temp).symlink_to(tmpdir, target_is_directory=True),
+        AsyncPath(win_temp).symlink_to(tmpdir, target_is_directory=True),
+    )
 
 
-def _run_winetricks(
+async def _run_winetricks(
     prefix_name: str,
     tricks_list: list[str],
     windows_version: WineWindowsVersion,
@@ -278,7 +300,7 @@ def _run_winetricks(
         tricks_list += ['isolate_home', 'sandbox']
     if vd != 'off':
         tricks_list.append(f'vd={vd}')
-    if winetricks := which('winetricks'):
+    if winetricks := await run_in_thread(partial(which, 'winetricks')):
         cmd = (
             winetricks,
             '--force',
@@ -287,54 +309,66 @@ def _run_winetricks(
             f'prefix={prefix_name}',
             *sorted(set(tricks_list)),
         )
-        _run_cmd(cmd)
+        await _run_cmd(cmd)
 
 
-def _setup_dxvk_nvapi(target: Path, env: dict[str, str], *, _32bit: bool = False) -> None:
-    _run_cmd(('setup_vkd3d_proton.sh', 'install'), env)
+async def _setup_dxvk_nvapi(target: Path,
+                            env: dict[str, str],
+                            session: niquests.AsyncSession,
+                            *,
+                            _32bit: bool = False) -> None:
+    await _run_cmd(('setup_vkd3d_proton.sh', 'install'), env)
     version = '0.8.3'
     nvidia_libs = 'nvidia-libs'
     prefix_tar = f'{nvidia_libs}-{version}'
-    r = requests.get(
+    r = await session.get(
         f'https://github.com/SveSop/{nvidia_libs}/releases/download/v{version}/{prefix_tar}.tar.xz',
         timeout=15,
     )
     r.raise_for_status()
-    with xz.open(BytesIO(r.content)) as xz_file, tarfile.TarFile(fileobj=xz_file) as tar:
-        for item in ('nvcuda', 'nvcuvid', 'nvencodeapi', 'nvapi'):
-            _run_reg(env, r'HKCU\Software\Wine\DllOverrides', '/v', item, '/d', 'native', '/f')
+    content = r.content or b''
+    with xz.open(BytesIO(content)) as xz_file, tarfile.TarFile(fileobj=xz_file) as tar:
+        x32_items = ('nvcuda', 'nvcuvid', 'nvencodeapi', 'nvapi')
+        for item in x32_items:
             member = tar.getmember(f'{prefix_tar}/x32/{item}.dll')
             member.name = f'{item}.dll'
-            tar.extract(member, target / 'drive_c' / 'windows' / 'syswow64')
+            await run_in_thread(
+                partial(tar.extract, member, target / 'drive_c' / 'windows' / 'syswow64'))
+        await asyncio.gather(
+            *(_run_reg(env, r'HKCU\Software\Wine\DllOverrides', '/v', item, '/d', 'native', '/f')
+              for item in x32_items))
         if not _32bit:
-            for item in (
-                    'nvcuda',
-                    'nvoptix',
-                    'nvcuvid',
-                    'nvencodeapi64',
-                    'nvapi64',
-                    'nvofapi64',
-            ):
-                _run_reg(
-                    env,
-                    r'HKCU\Software\Wine\DllOverrides',
-                    '/v',
-                    item,
-                    '/d',
-                    'native',
-                    '/f',
-                    wine_bin='wine64',
-                )
+            x64_items = (
+                'nvcuda',
+                'nvoptix',
+                'nvcuvid',
+                'nvencodeapi64',
+                'nvapi64',
+                'nvofapi64',
+            )
+            for item in x64_items:
                 member = tar.getmember(f'{prefix_tar}/x64/{item}.dll')
                 member.name = f'{item}.dll'
-                tar.extract(member, target / 'drive_c' / 'windows' / 'system32')
-    for pfx in ('', '_'):
-        copyfile(
+                await run_in_thread(
+                    partial(tar.extract, member, target / 'drive_c' / 'windows' / 'system32'))
+            await asyncio.gather(*(_run_reg(
+                env,
+                r'HKCU\Software\Wine\DllOverrides',
+                '/v',
+                item,
+                '/d',
+                'native',
+                '/f',
+                wine_bin='wine64',
+            ) for item in x64_items))
+    await asyncio.gather(*(run_in_thread(
+        partial(
+            copyfile,
             f'/lib64/nvidia/wine/{pfx}nvngx.dll',
             target / 'drive_c' / 'windows' / 'system32' / f'{pfx}nvngx.dll',
-        )
+        )) for pfx in ('', '_')))
     if not _32bit:
-        _run_reg(
+        await _run_reg(
             env,
             r'HKLM\Software\NVIDIA Corporation\Global\NGXCore',
             '/t',
@@ -348,20 +382,20 @@ def _setup_dxvk_nvapi(target: Path, env: dict[str, str], *, _32bit: bool = False
         )
 
 
-def _apply_noto_sans(env: dict[str, str]) -> None:
-    for font_name in _CREATE_WINE_PREFIX_NOTO_FONT_REPLACEMENTS:
-        _run_reg(
-            env,
-            r'HKLM\Software\Microsoft\Windows NT\CurrentVersion\FontSubstitutes',
-            '/t',
-            'REG_SZ',
-            '/v',
-            font_name,
-            '/d',
-            'Noto Sans',
-            '/f',
-        )
+async def _apply_noto_sans(env: dict[str, str]) -> None:
+    await asyncio.gather(*(_run_reg(
+        env,
+        r'HKLM\Software\Microsoft\Windows NT\CurrentVersion\FontSubstitutes',
+        '/t',
+        'REG_SZ',
+        '/v',
+        font_name,
+        '/d',
+        'Noto Sans',
+        '/f',
+    ) for font_name in _CREATE_WINE_PREFIX_NOTO_FONT_REPLACEMENTS))
     face_name = 'Noto Sans'.encode('utf-16le').ljust(LF_FULLFACESIZE, b'\0')
+    coros: list[Coroutine[Any, Any, None]] = []
     for entry_name in _CREATE_WINE_PREFIX_NOTO_REGISTRY_ENTRIES:
         weight = Weight.FW_BOLD if entry_name == 'Caption' else Weight.FW_NORMAL
         packed = struct.pack(
@@ -383,65 +417,71 @@ def _apply_noto_sans(env: dict[str, str]) -> None:
             ),
             *face_name,
         )
-        _run_reg(
-            env,
-            r'HKCU\Control Panel\Desktop\WindowMetrics',
-            '/t',
-            'REG_BINARY',
-            '/v',
-            f'{entry_name}Font',
-            '/d',
-            ''.join(f'{x:02x}' for x in packed),
-            '/f',
-        )
+        coros.append(
+            _run_reg(
+                env,
+                r'HKCU\Control Panel\Desktop\WindowMetrics',
+                '/t',
+                'REG_BINARY',
+                '/v',
+                f'{entry_name}Font',
+                '/d',
+                ''.join(f'{x:02x}' for x in packed),
+                '/f',
+            ))
+    await asyncio.gather(*coros)
 
 
-def _add_q4wine_prefix(prefix_name: str, target: Path) -> None:
+async def _add_q4wine_prefix(prefix_name: str, target: Path) -> None:
     db_path = platformdirs.user_config_path() / 'q4wine/db/generic.dat'
-    if not db_path.exists():
+    if not await AsyncPath(db_path).exists():
         return
     log.debug('Adding this prefix to Q4Wine.')
     run_string = (r'%CONSOLE_BIN% %CONSOLE_ARGS% %ENV_BIN% %ENV_ARGS% /bin/sh -c '
                   r'"%WORK_DIR% %SET_NICE% %WINE_BIN% %VIRTUAL_DESKTOP% %PROGRAM_BIN% '
                   r'%PROGRAM_ARGS% 2>&1 "')
-    with sqlite3.connect(db_path) as conn:
-        c = conn.cursor()
-        c.execute(
-            'INSERT INTO prefix (name, path, mountpoint_windrive, run_string, version_id) '
-            'VALUES (?, ?, ?, ?, 1)',
-            (prefix_name, str(target), 'D:', run_string),
-        )
-        prefix_id = c.lastrowid
-        if prefix_id is None:
-            msg = 'Q4Wine insert did not return a prefix row ID.'
-            raise RuntimeError(msg)
-        log.debug('Q4Wine prefix ID: %d', prefix_id)
-        for dir_name in ('system', 'autostart', 'import'):
-            c.execute('INSERT INTO dir (name, prefix_id) VALUES (?, ?)', (dir_name, prefix_id))
-        for args, exec_, icon_path, desc, folder, display_name in Q4WINE_DEFAULT_ICONS:
+
+    def _do_q4wine_insert() -> None:
+        with sqlite3.connect(db_path) as conn:
+            c = conn.cursor()
             c.execute(
-                """INSERT INTO icon (
+                'INSERT INTO prefix (name, path, mountpoint_windrive, run_string, version_id) '
+                'VALUES (?, ?, ?, ?, 1)',
+                (prefix_name, str(target), 'D:', run_string),
+            )
+            prefix_id = c.lastrowid
+            if prefix_id is None:
+                msg = 'Q4Wine insert did not return a prefix row ID.'
+                raise RuntimeError(msg)
+            log.debug('Q4Wine prefix ID: %d', prefix_id)
+            for dir_name in ('system', 'autostart', 'import'):
+                c.execute('INSERT INTO dir (name, prefix_id) VALUES (?, ?)', (dir_name, prefix_id))
+            for args, exec_, icon_path, desc, folder, display_name in Q4WINE_DEFAULT_ICONS:
+                c.execute(
+                    """INSERT INTO icon (
     cmdargs, exec, icon_path, desc, dir_id, name, prefix_id, nice)
     VALUES (
         ?, ?, ?, ?, (
             SELECT id FROM dir WHERE name = ? AND prefix_id = ?
         ), ?, ?, 0
     )""",
-                (
-                    args or None,
-                    exec_,
-                    icon_path,
-                    desc,
-                    folder,
-                    prefix_id,
-                    display_name,
-                    prefix_id,
-                ),
-            )
-        c.execute('DELETE FROM logging WHERE prefix_id = ?', (prefix_id,))
+                    (
+                        args or None,
+                        exec_,
+                        icon_path,
+                        desc,
+                        folder,
+                        prefix_id,
+                        display_name,
+                        prefix_id,
+                    ),
+                )
+            c.execute('DELETE FROM logging WHERE prefix_id = ?', (prefix_id,))
+
+    await run_in_thread(_do_q4wine_insert)
 
 
-def create_wine_prefix(  # noqa: PLR0913
+async def create_wine_prefix(  # noqa: PLR0913
     prefix_name: str,
     *,
     _32bit: bool = False,
@@ -503,7 +543,7 @@ def create_wine_prefix(  # noqa: PLR0913
         Disable XDG support.
     noto_sans : bool
         Use Noto Sans font.
-    prefix_root : StrPath | Path | None
+    prefix_root : str | PathLike[str] | None
         Root directory for the prefix. If ``None``, defaults to ``~/.local/share/wineprefixes``.
     sandbox : bool
         Enable sandbox mode.
@@ -526,52 +566,57 @@ def create_wine_prefix(  # noqa: PLR0913
     Raises
     ------
     FileExistsError
+        If the prefix directory already exists.
     """
     tricks_list = list((t for t in tricks
                         if t not in WINETRICKS_VERSION_MAPPING.values() and not t.startswith('vd=')
                         ) if tricks else [])
     root = Path(prefix_root) if prefix_root else Path.home() / '.local/share/wineprefixes'
-    root.mkdir(parents=True, exist_ok=True)
+    await AsyncPath(root).mkdir(parents=True, exist_ok=True)
     target = root / prefix_name
-    if target.exists():
+    if await AsyncPath(target).exists():
         raise FileExistsError
     if 'DISPLAY' not in environ or 'XAUTHORITY' not in environ:
         log.warning(
             'Wine will likely fail to run since DISPLAY or XAUTHORITY are not in the environment.')
     env = _build_prefix_env(target, _32bit=_32bit)
-    _run_cmd(('wineboot', '--init'), env)
-    _run_cmd(('wineserver', '-w'), env)
-    _apply_initial_registry(
-        env,
-        dpi,
-        dxva_vaapi=dxva_vaapi,
-        eax=eax,
-        gtk=gtk,
-        winrt_dark=winrt_dark,
-        no_associations=no_associations,
-        no_xdg=no_xdg,
-        no_mono=no_mono,
-        no_gecko=no_gecko,
-        disable_explorer=disable_explorer,
-        disable_services=disable_services,
-    )
+    await _run_cmd(('wineboot', '--init'), env)
+    await _run_cmd(('wineserver', '-w'), env)
+    coros: list[Coroutine[Any, Any, None]] = [
+        _apply_initial_registry(
+            env,
+            dpi,
+            disable_explorer=disable_explorer,
+            disable_services=disable_services,
+            dxva_vaapi=dxva_vaapi,
+            eax=eax,
+            gtk=gtk,
+            no_associations=no_associations,
+            no_gecko=no_gecko,
+            no_mono=no_mono,
+            no_xdg=no_xdg,
+            winrt_dark=winrt_dark,
+        )
+    ]
     if tmpfs:
-        _setup_tmpfs(target)
+        coros.append(_setup_tmpfs(target))
+    await asyncio.gather(*coros)
     if dxvk_nvapi:
         tricks_list.append('dxvk')
     try:
-        _run_winetricks(prefix_name, tricks_list, windows_version, sandbox=sandbox, vd=vd)
+        await _run_winetricks(prefix_name, tricks_list, windows_version, sandbox=sandbox, vd=vd)
     except sp.CalledProcessError as e:  # pragma: no cover
         log.warning('Winetricks exit code was %d but it may have succeeded.', e.returncode)
     if dxvk_nvapi:
-        _setup_dxvk_nvapi(target, env, _32bit=_32bit)
+        async with niquests.AsyncSession() as session:
+            await _setup_dxvk_nvapi(target, env, session, _32bit=_32bit)
     if noto_sans:
-        _apply_noto_sans(env)
+        await _apply_noto_sans(env)
     if asio:
-        if register := which('wineasio-register'):
+        if register := await run_in_thread(partial(which, 'wineasio-register')):
             log.debug('Running: %s', register)
-            sp.run((register,), env=env, check=True)
+            await _run_cmd((register,), env)
         else:
             log.warning('Skipping ASIO setup because wineasio-register is not in PATH.')
-    _add_q4wine_prefix(prefix_name, target)
+    await _add_q4wine_prefix(prefix_name, target)
     return target

@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from shlex import quote
 from typing import get_args
+import asyncio
 import subprocess as sp
 import sys
 
@@ -85,52 +86,52 @@ def main(
     tmpfs: bool = False,
     winrt_dark: bool = False,
 ) -> None:
-    """
-    Create a Wine prefix with custom settings.
-
-    This should be used with eval: eval $(mkwineprefix ...)
-    """  # noqa: DOC501
+    """Create a Wine prefix with custom settings."""
     setup_logging(debug=debug, loggers={'mkwineprefix': {}})
-    try:
-        target = create_wine_prefix(
-            prefix_name,
-            _32bit=_32bit,
-            asio=asio,
-            disable_explorer=disable_explorer,
-            disable_services=disable_services,
-            dpi=dpi,
-            dxva_vaapi=dxva_vaapi,
-            dxvk_nvapi=nvapi,
-            eax=eax,
-            gtk=gtk,
-            no_associations=no_assocs,
-            no_gecko=no_gecko,
-            no_mono=no_mono,
-            no_xdg=no_xdg,
-            noto_sans=noto,
-            prefix_root=prefix_root,
-            sandbox=sandbox,
-            tmpfs=tmpfs,
-            tricks=tricks,
-            vd=vd,
-            windows_version=windows_version,
-            winrt_dark=winrt_dark,
-        )
-    except FileExistsError as e:
-        raise click.Abort from e
-    except sp.CalledProcessError as e:
-        click.echo(f'Exception: {e}', err=True)
-        click.echo(f'STDERR: {e.stderr}', err=True)
-        click.echo(f'STDOUT: {e.stdout}', err=True)
-        raise click.Abort from e
-    wineprefix_env = quote(f'WINEPREFIX={target}')
-    click.echo(
-        f"""Run `export WINEPREFIX={target}` before running wine or use env:
+
+    async def _run() -> None:
+        try:
+            target = await create_wine_prefix(
+                prefix_name,
+                _32bit=_32bit,
+                asio=asio,
+                disable_explorer=disable_explorer,
+                disable_services=disable_services,
+                dpi=dpi,
+                dxva_vaapi=dxva_vaapi,
+                dxvk_nvapi=nvapi,
+                eax=eax,
+                gtk=gtk,
+                no_associations=no_assocs,
+                no_gecko=no_gecko,
+                no_mono=no_mono,
+                no_xdg=no_xdg,
+                noto_sans=noto,
+                prefix_root=prefix_root,
+                sandbox=sandbox,
+                tmpfs=tmpfs,
+                tricks=tricks,
+                vd=vd,
+                windows_version=windows_version,
+                winrt_dark=winrt_dark,
+            )
+        except FileExistsError as e:
+            raise click.Abort from e
+        except sp.CalledProcessError as e:
+            click.echo(f'Exception: {e}', err=True)
+            click.echo(f'STDERR: {e.stderr}', err=True)
+            click.echo(f'STDOUT: {e.stdout}', err=True)
+            raise click.Abort from e
+        wineprefix_env = quote(f'WINEPREFIX={target}')
+        click.echo(
+            f"""Run `export WINEPREFIX={target}` before running wine or use env:
 
 env {wineprefix_env} wine ...
 
 If you ran this with eval, your shell is ready.""",
-        file=sys.stderr,
-    )
-    click.echo(f'export {wineprefix_env}')
-    click.echo(f'export PS1="{prefix_name}🍷$PS1"')
+            file=sys.stderr,
+        )
+        click.echo(f'export {wineprefix_env}')
+        click.echo(f'export PS1="{prefix_name}🍷$PS1"')
+
+    asyncio.run(_run())

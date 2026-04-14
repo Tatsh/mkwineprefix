@@ -9,6 +9,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [unreleased]
 
+### Changed
+
+- Switched HTTP library from `requests` to `niquests`.
+- Converted all library code from synchronous to asynchronous using `asyncio`, `anyio.Path`, and
+  `asyncio.create_subprocess_exec`.
+- `create_wine_prefix()` is now an `async` function. Callers must `await` it or run it inside an
+  event loop.
+- Use `asyncio.gather()` for concurrent subprocess and I/O operations.
+
 ### Fixed
 
 - Raise `RuntimeError` with a clear message when Q4Wine prefix registration does not return a
