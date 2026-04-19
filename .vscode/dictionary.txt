@@ -1,6 +1,6 @@
 anchore
-anyio
 Ångström
+anyio
 appdir
 appimage
 appinfo
@@ -38,6 +38,7 @@ dxva
 dxvk
 eeyore
 elif
+esac
 esbenp
 esbonio
 esync
@@ -84,9 +85,9 @@ mshtml
 myproject
 mypy
 namedtuples
+niquests
 norecursedirs
 notarytool
-niquests
 noto
 npmjs
 numpy
@@ -105,8 +106,8 @@ pathlib
 pavelzw
 pipx
 platformdirs
-proc
 plistlib
+proc
 prodvers
 pycache
 pydantic
@@ -118,8 +119,10 @@ pypa
 pypi
 pyproject
 pytest
+pythonhosted
 regedit
 regen
+ripgreprc
 rstcheck
 schemafile
 sdist
@@ -144,6 +147,7 @@ tomlkit
 tomllib
 tomlq
 tonumber
+tostring
 tryfirst
 ubyte
 udvare
