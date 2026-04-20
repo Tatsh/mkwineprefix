@@ -9,7 +9,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-04-12T02:04:53.506142065Z"
+exclude-newer = "2026-04-13T00:54:29.27752552Z"
 exclude-newer-span = "P1W"
 
 [[package]]
@@ -153,6 +153,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/7d/b2/51899539b6ceeeb420d40ed3cd4b7a40519404f9baf3d4ac99dc413a834b/babel-2.18.0.tar.gz", hash = "sha256:b80b99a14bd085fcacfa15c9165f651fbb3406e66cc603abf11c5750937c992d", size = 9959554, upload-time = "2026-02-01T12:30:56.078Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/77/f5/21d2de20e8b8b0408f0681956ca2c69f1320a3848ac50e6e7f39c6159675/babel-2.18.0-py3-none-any.whl", hash = "sha256:e2b422b277c2b9a9630c1d7903c2a00d0830c409c59ac8cae9081c92f1aeba35", size = 10196845, upload-time = "2026-02-01T12:30:53.445Z" },
+]
+
+[[package]]
+name = "backports-asyncio-runner"
+version = "1.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/8e/ff/70dca7d7cb1cbc0edb2c6cc0c38b65cba36cccc491eca64cabd5fe7f8670/backports_asyncio_runner-1.2.0.tar.gz", hash = "sha256:a5aa7b2b7d8f8bfcaa2b57313f70792df84e32a2a746f585213373f900b42162", size = 69893, upload-time = "2025-07-02T02:27:15.685Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a0/59/76ab57e3fe74484f48a53f8e337171b4a2349e506eabe136d7e01d059086/backports_asyncio_runner-1.2.0-py3-none-any.whl", hash = "sha256:0da0a936a8aeb554eccb426dc55af3ba63bcdc69fa1a600b5bb305413a4477b5", size = 12313, upload-time = "2025-07-02T02:27:14.263Z" },
 ]
 
 [[package]]
@@ -1082,6 +1091,7 @@ tests = [
     { name = "coveralls" },
     { name = "mock" },
     { name = "pytest" },
+    { name = "pytest-asyncio" },
     { name = "pytest-cov" },
     { name = "pytest-mock" },
 ]
@@ -1124,6 +1134,7 @@ tests = [
     { name = "coveralls", specifier = ">=4.1.0" },
     { name = "mock", specifier = ">=5.2.0" },
     { name = "pytest", specifier = ">=9.0.3" },
+    { name = "pytest-asyncio", specifier = ">=1.3.0" },
     { name = "pytest-cov", specifier = ">=7.1.0" },
     { name = "pytest-mock", specifier = ">=3.15.1" },
 ]
@@ -1562,6 +1573,20 @@ wheels = [
 ]
 
 [[package]]
+name = "pytest-asyncio"
+version = "1.3.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "backports-asyncio-runner", marker = "python_full_version < '3.11'" },
+    { name = "pytest" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/90/2c/8af215c0f776415f3590cac4f9086ccefd6fd463befeae41cd4d3f193e5a/pytest_asyncio-1.3.0.tar.gz", hash = "sha256:d7f52f36d231b80ee124cd216ffb19369aa168fc10095013c6b014a34d3ee9e5", size = 50087, upload-time = "2025-11-10T16:07:47.256Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e5/35/f8b19922b6a25bc0880171a2f1a003eaeb93657475193ab516fd87cac9da/pytest_asyncio-1.3.0-py3-none-any.whl", hash = "sha256:611e26147c7f77640e6d0a92a38ed17c3e9848063698d5c93d5aa7aa11cebff5", size = 15075, upload-time = "2025-11-10T16:07:45.537Z" },
+]
+
+[[package]]
 name = "pytest-cov"
 version = "7.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1795,15 +1820,15 @@ wheels = [
 
 [[package]]
 name = "rich"
-version = "14.3.4"
+version = "15.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "markdown-it-py" },
     { name = "pygments" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e9/67/cae617f1351490c25a4b8ac3b8b63a4dda609295d8222bad12242dfdc629/rich-14.3.4.tar.gz", hash = "sha256:817e02727f2b25b40ef56f5aa2217f400c8489f79ca8f46ea2b70dd5e14558a9", size = 230524, upload-time = "2026-04-11T02:57:45.419Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c0/8f/0722ca900cc807c13a6a0c696dacf35430f72e0ec571c4275d2371fca3e9/rich-15.0.0.tar.gz", hash = "sha256:edd07a4824c6b40189fb7ac9bc4c52536e9780fbbfbddf6f1e2502c31b068c36", size = 230680, upload-time = "2026-04-12T08:24:00.75Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b3/76/6d163cfac87b632216f71879e6b2cf17163f773ff59c00b5ff4900a80fa3/rich-14.3.4-py3-none-any.whl", hash = "sha256:07e7adb4690f68864777b1450859253bed81a99a31ac321ac1817b2313558952", size = 310480, upload-time = "2026-04-11T02:57:47.484Z" },
+    { url = "https://files.pythonhosted.org/packages/82/3b/64d4899d73f91ba49a8c18a8ff3f0ea8f1c1d75481760df8c68ef5235bf5/rich-15.0.0-py3-none-any.whl", hash = "sha256:33bd4ef74232fb73fe9279a257718407f169c09b78a87ad3d296f548e27de0bb", size = 310654, upload-time = "2026-04-12T08:24:02.83Z" },
 ]
 
 [[package]]
@@ -2502,16 +2527,16 @@ wheels = [
 
 [[package]]
 name = "urllib3-future"
-version = "2.19.905"
+version = "2.19.906"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "h11" },
     { name = "jh2" },
     { name = "qh3", marker = "(python_full_version < '3.12' and platform_machine == 'AMD64' and platform_python_implementation == 'PyPy' and sys_platform == 'darwin') or (python_full_version < '3.12' and platform_machine == 'ARM64' and platform_python_implementation == 'PyPy' and sys_platform == 'darwin') or (python_full_version < '3.12' and platform_machine == 'aarch64' and platform_python_implementation == 'PyPy' and sys_platform == 'darwin') or (python_full_version < '3.12' and platform_machine == 'arm64' and platform_python_implementation == 'PyPy' and sys_platform == 'darwin') or (python_full_version < '3.12' and platform_machine == 'armv7l' and platform_python_implementation == 'PyPy' and sys_platform == 'darwin') or (python_full_version < '3.12' and platform_machine == 'i686' and platform_python_implementation == 'PyPy' and sys_platform == 'darwin') or (python_full_version < '3.12' and platform_machine == 'ppc64' and platform_python_implementation == 'PyPy' and sys_platform == 'darwin') or (python_full_version < '3.12' and platform_machine == 'ppc64le' and platform_python_implementation == 'PyPy' and sys_platform == 'darwin') or (python_full_version < '3.12' and platform_machine == 'riscv64' and platform_python_implementation == 'PyPy' and sys_platform == 'darwin') or (python_full_version < '3.12' and platform_machine == 'riscv64gc' and platform_python_implementation == 'PyPy' and sys_platform == 'darwin') or (python_full_version < '3.12' and platform_machine == 's390x' and platform_python_implementation == 'PyPy' and sys_platform == 'darwin') or (python_full_version < '3.12' and platform_machine == 'x86' and platform_python_implementation == 'PyPy' and sys_platform == 'darwin') or (python_full_version < '3.12' and platform_machine == 'x86_64' and platform_python_implementation == 'PyPy' and sys_platform == 'darwin') or (python_full_version < '3.12' and platform_machine == 'AMD64' and platform_python_implementation == 'PyPy' and sys_platform == 'linux') or (python_full_version < '3.12' and platform_machine == 'ARM64' and platform_python_implementation == 'PyPy' and sys_platform == 'linux') or (python_full_version < '3.12' and platform_machine == 'aarch64' and platform_python_implementation == 'PyPy' and sys_platform == 'linux') or (python_full_version < '3.12' and platform_machine == 'arm64' and platform_python_implementation == 'PyPy' and sys_platform == 'linux') or (python_full_version < '3.12' and platform_machine == 'armv7l' and platform_python_implementation == 'PyPy' and sys_platform == 'linux') or (python_full_version < '3.12' and platform_machine == 'i686' and platform_python_implementation == 'PyPy' and sys_platform == 'linux') or (python_full_version < '3.12' and platform_machine == 'ppc64' and platform_python_implementation == 'PyPy' and sys_platform == 'linux') or (python_full_version < '3.12' and platform_machine == 'ppc64le' and platform_python_implementation == 'PyPy' and sys_platform == 'linux') or (python_full_version < '3.12' and platform_machine == 'riscv64' and platform_python_implementation == 'PyPy' and sys_platform == 'linux') or (python_full_version < '3.12' and platform_machine == 'riscv64gc' and platform_python_implementation == 'PyPy' and sys_platform == 'linux') or (python_full_version < '3.12' and platform_machine == 's390x' and platform_python_implementation == 'PyPy' and sys_platform == 'linux') or (python_full_version < '3.12' and platform_machine == 'x86' and platform_python_implementation == 'PyPy' and sys_platform == 'linux') or (python_full_version < '3.12' and platform_machine == 'x86_64' and platform_python_implementation == 'PyPy' and sys_platform == 'linux') or (python_full_version < '3.12' and platform_machine == 'AMD64' and platform_python_implementation == 'PyPy' and sys_platform == 'win32') or (python_full_version < '3.12' and platform_machine == 'ARM64' and platform_python_implementation == 'PyPy' and sys_platform == 'win32') or (python_full_version < '3.12' and platform_machine == 'aarch64' and platform_python_implementation == 'PyPy' and sys_platform == 'win32') or (python_full_version < '3.12' and platform_machine == 'arm64' and platform_python_implementation == 'PyPy' and sys_platform == 'win32') or (python_full_version < '3.12' and platform_machine == 'armv7l' and platform_python_implementation == 'PyPy' and sys_platform == 'win32') or (python_full_version < '3.12' and platform_machine == 'i686' and platform_python_implementation == 'PyPy' and sys_platform == 'win32') or (python_full_version < '3.12' and platform_machine == 'ppc64' and platform_python_implementation == 'PyPy' and sys_platform == 'win32') or (python_full_version < '3.12' and platform_machine == 'ppc64le' and platform_python_implementation == 'PyPy' and sys_platform == 'win32') or (python_full_version < '3.12' and platform_machine == 'riscv64' and platform_python_implementation == 'PyPy' and sys_platform == 'win32') or (python_full_version < '3.12' and platform_machine == 'riscv64gc' and platform_python_implementation == 'PyPy' and sys_platform == 'win32') or (python_full_version < '3.12' and platform_machine == 's390x' and platform_python_implementation == 'PyPy' and sys_platform == 'win32') or (python_full_version < '3.12' and platform_machine == 'x86' and platform_python_implementation == 'PyPy' and sys_platform == 'win32') or (python_full_version < '3.12' and platform_machine == 'x86_64' and platform_python_implementation == 'PyPy' and sys_platform == 'win32') or (platform_machine == 'AMD64' and platform_python_implementation == 'CPython' and sys_platform == 'darwin') or (platform_machine == 'ARM64' and platform_python_implementation == 'CPython' and sys_platform == 'darwin') or (platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'darwin') or (platform_machine == 'arm64' and platform_python_implementation == 'CPython' and sys_platform == 'darwin') or (platform_machine == 'armv7l' and platform_python_implementation == 'CPython' and sys_platform == 'darwin') or (platform_machine == 'i686' and platform_python_implementation == 'CPython' and sys_platform == 'darwin') or (platform_machine == 'ppc64' and platform_python_implementation == 'CPython' and sys_platform == 'darwin') or (platform_machine == 'ppc64le' and platform_python_implementation == 'CPython' and sys_platform == 'darwin') or (platform_machine == 'riscv64' and platform_python_implementation == 'CPython' and sys_platform == 'darwin') or (platform_machine == 'riscv64gc' and platform_python_implementation == 'CPython' and sys_platform == 'darwin') or (platform_machine == 's390x' and platform_python_implementation == 'CPython' and sys_platform == 'darwin') or (platform_machine == 'x86' and platform_python_implementation == 'CPython' and sys_platform == 'darwin') or (platform_machine == 'x86_64' and platform_python_implementation == 'CPython' and sys_platform == 'darwin') or (platform_machine == 'AMD64' and platform_python_implementation == 'CPython' and sys_platform == 'linux') or (platform_machine == 'ARM64' and platform_python_implementation == 'CPython' and sys_platform == 'linux') or (platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux') or (platform_machine == 'arm64' and platform_python_implementation == 'CPython' and sys_platform == 'linux') or (platform_machine == 'armv7l' and platform_python_implementation == 'CPython' and sys_platform == 'linux') or (platform_machine == 'i686' and platform_python_implementation == 'CPython' and sys_platform == 'linux') or (platform_machine == 'ppc64' and platform_python_implementation == 'CPython' and sys_platform == 'linux') or (platform_machine == 'ppc64le' and platform_python_implementation == 'CPython' and sys_platform == 'linux') or (platform_machine == 'riscv64' and platform_python_implementation == 'CPython' and sys_platform == 'linux') or (platform_machine == 'riscv64gc' and platform_python_implementation == 'CPython' and sys_platform == 'linux') or (platform_machine == 's390x' and platform_python_implementation == 'CPython' and sys_platform == 'linux') or (platform_machine == 'x86' and platform_python_implementation == 'CPython' and sys_platform == 'linux') or (platform_machine == 'x86_64' and platform_python_implementation == 'CPython' and sys_platform == 'linux') or (platform_machine == 'AMD64' and platform_python_implementation == 'CPython' and sys_platform == 'win32') or (platform_machine == 'ARM64' and platform_python_implementation == 'CPython' and sys_platform == 'win32') or (platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'win32') or (platform_machine == 'arm64' and platform_python_implementation == 'CPython' and sys_platform == 'win32') or (platform_machine == 'armv7l' and platform_python_implementation == 'CPython' and sys_platform == 'win32') or (platform_machine == 'i686' and platform_python_implementation == 'CPython' and sys_platform == 'win32') or (platform_machine == 'ppc64' and platform_python_implementation == 'CPython' and sys_platform == 'win32') or (platform_machine == 'ppc64le' and platform_python_implementation == 'CPython' and sys_platform == 'win32') or (platform_machine == 'riscv64' and platform_python_implementation == 'CPython' and sys_platform == 'win32') or (platform_machine == 'riscv64gc' and platform_python_implementation == 'CPython' and sys_platform == 'win32') or (platform_machine == 's390x' and platform_python_implementation == 'CPython' and sys_platform == 'win32') or (platform_machine == 'x86' and platform_python_implementation == 'CPython' and sys_platform == 'win32') or (platform_machine == 'x86_64' and platform_python_implementation == 'CPython' and sys_platform == 'win32')" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5b/d1/6c75acaa5848e2327937cb193df60e49e0e59285227be080c1ddebe7149c/urllib3_future-2.19.905.tar.gz", hash = "sha256:eff59e3c53b7762e288d342b0d53fd34a8a94e6d6d897ecb667c6719537f964e", size = 1155093, upload-time = "2026-04-10T12:05:30.243Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/87/a8/f90942835042e495ac51a9b5fd9448f34b425585a03f220812b70e6af0f0/urllib3_future-2.19.906.tar.gz", hash = "sha256:d0b99e7fe7b870c14c3b2e0c6fe89775332f751187334434cc2474d8cb1f7d84", size = 1156567, upload-time = "2026-04-12T10:53:17.881Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/31/ad/8be18a6ab03bd557e20d51e5db83b38a44a5b08e8e6a2fabbac27313826a/urllib3_future-2.19.905-py3-none-any.whl", hash = "sha256:1ea385c64b8197fa81668b2bf507d578d49f0411f5e2fa00a7603f1ca6123e2c", size = 721408, upload-time = "2026-04-10T12:05:28.55Z" },
+    { url = "https://files.pythonhosted.org/packages/0e/b6/2d35ba342e5e9c5f6e8e85bcccdc690334a548654ba548e3adf44ae6692f/urllib3_future-2.19.906-py3-none-any.whl", hash = "sha256:5d41607eec3812d4e49464b98bc2fb2b1b461dcf6fc73036790df4206e3c01d4", size = 722690, upload-time = "2026-04-12T10:53:15.767Z" },
 ]
 
 [[package]]

@@ -10,11 +10,14 @@ import pytest
 if TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
+_EMPTY_FAIL_CMDS: frozenset[str] = frozenset()
 
-def _mock_async_subprocess(mocker: MockerFixture, *,
-                           fail_cmds: frozenset[str] = frozenset()) -> AsyncMock:
+
+def _mock_async_subprocess(mocker: MockerFixture,
+                           *,
+                           fail_cmds: frozenset[str] = _EMPTY_FAIL_CMDS) -> AsyncMock:
     """Set up a mock for ``asyncio.create_subprocess_exec``."""
-    async def _create_subprocess(*args: Any, **_kwargs: Any) -> AsyncMock:
+    async def _create_subprocess(*args: Any, **_kwargs: Any) -> AsyncMock:  # noqa: RUF029
         proc = AsyncMock()
         proc.wait.return_value = 1 if args and args[0] in fail_cmds else 0
         return proc
