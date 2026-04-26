@@ -52,15 +52,12 @@ async def test_create_wine_prefix_basic(mocker: MockerFixture) -> None:
     mocker.patch('mkwineprefix.prefix.rmtree')
     mocker.patch('mkwineprefix.prefix.tempfile.gettempdir', return_value='/tmp')
     mocker.patch('mkwineprefix.prefix.struct.pack', return_value=b'\x00' * 92)
-    mocker.patch.dict(
-        'mkwineprefix.prefix.environ',
-        {
-            'PATH': '/bin',
-            'DISPLAY': ':0',
-            'XAUTHORITY': '/tmp/.Xauthority'
-        },
-        clear=True,
-    )
+    mocker.patch.dict('mkwineprefix.prefix.environ', {
+        'PATH': '/bin',
+        'DISPLAY': ':0',
+        'XAUTHORITY': '/tmp/.Xauthority'
+    },
+                      clear=True)
     result = await create_wine_prefix('test-prefix')
     assert result is not None
     assert mock_subprocess.call_count > 0
@@ -80,15 +77,12 @@ async def test_create_wine_prefix_with_tricks_and_winetricks(mocker: MockerFixtu
     _mock_anyio_path(mocker)
     mock_path = mocker.patch('mkwineprefix.prefix.Path')
     mock_path.home.return_value.__truediv__.return_value = mock_path
-    mocker.patch.dict(
-        'mkwineprefix.prefix.environ',
-        {
-            'PATH': '/bin',
-            'DISPLAY': ':0',
-            'XAUTHORITY': '/tmp/.Xauthority'
-        },
-        clear=True,
-    )
+    mocker.patch.dict('mkwineprefix.prefix.environ', {
+        'PATH': '/bin',
+        'DISPLAY': ':0',
+        'XAUTHORITY': '/tmp/.Xauthority'
+    },
+                      clear=True)
     await create_wine_prefix('prefix2', tricks=['corefonts', 'win10'])
     assert any(
         args[0][0] == '/usr/bin/winetricks' for args in mock_subprocess.call_args_list if args[0])
@@ -102,38 +96,33 @@ async def test_create_wine_prefix_with_options(mocker: MockerFixture) -> None:
     mock_path.home.return_value.__truediv__.return_value = mock_path
     mocker.patch('mkwineprefix.prefix.sqlite3')
     mocker.patch('mkwineprefix.prefix.struct.pack', return_value=b'\x00' * 92)
-    mocker.patch.dict(
-        'mkwineprefix.prefix.environ',
-        {
-            'PATH': '/bin',
-            'DISPLAY': ':0',
-            'XAUTHORITY': '/tmp/.Xauthority'
-        },
-        clear=True,
-    )
-    await create_wine_prefix(
-        'prefix3',
-        _32bit=True,
-        asio=True,
-        disable_explorer=True,
-        disable_services=True,
-        dpi=120,
-        dxva_vaapi=True,
-        dxvk_nvapi=False,
-        eax=True,
-        gtk=True,
-        no_associations=True,
-        no_gecko=True,
-        no_mono=True,
-        no_xdg=True,
-        noto_sans=True,
-        sandbox=True,
-        tmpfs=True,
-        tricks=['corefonts'],
-        vd='1024x768',
-        windows_version='7',
-        winrt_dark=True,
-    )
+    mocker.patch.dict('mkwineprefix.prefix.environ', {
+        'PATH': '/bin',
+        'DISPLAY': ':0',
+        'XAUTHORITY': '/tmp/.Xauthority'
+    },
+                      clear=True)
+    await create_wine_prefix('prefix3',
+                             _32bit=True,
+                             asio=True,
+                             disable_explorer=True,
+                             disable_services=True,
+                             dpi=120,
+                             dxva_vaapi=True,
+                             dxvk_nvapi=False,
+                             eax=True,
+                             gtk=True,
+                             no_associations=True,
+                             no_gecko=True,
+                             no_mono=True,
+                             no_xdg=True,
+                             noto_sans=True,
+                             sandbox=True,
+                             tmpfs=True,
+                             tricks=['corefonts'],
+                             vd='1024x768',
+                             windows_version='7',
+                             winrt_dark=True)
     assert mock_subprocess.call_count > 5
 
 
@@ -145,24 +134,19 @@ async def test_create_wine_prefix_handles_winetricks_failure(mocker: MockerFixtu
     mock_path = mocker.patch('mkwineprefix.prefix.Path')
     mock_path.home.return_value.__truediv__.return_value = mock_path
     mocker.patch('mkwineprefix.prefix.logging.getLogger', return_value=mocker.Mock())
-    mocker.patch.dict(
-        'mkwineprefix.prefix.environ',
-        {
-            'PATH': '/bin',
-            'DISPLAY': ':0',
-            'XAUTHORITY': '/tmp/.Xauthority'
-        },
-        clear=True,
-    )
+    mocker.patch.dict('mkwineprefix.prefix.environ', {
+        'PATH': '/bin',
+        'DISPLAY': ':0',
+        'XAUTHORITY': '/tmp/.Xauthority'
+    },
+                      clear=True)
     await create_wine_prefix('prefix4', tricks=['corefonts'])
 
 
 async def test_create_wine_prefix_dxvk_nvapi_true_no_q4wine_db(mocker: MockerFixture) -> None:
     mock_subprocess = _mock_async_subprocess(mocker)
-    mocker.patch(
-        'mkwineprefix.prefix.which',
-        side_effect=lambda x: '/usr/bin/winetricks' if x == 'winetricks' else None,
-    )
+    mocker.patch('mkwineprefix.prefix.which',
+                 side_effect=lambda x: '/usr/bin/winetricks' if x == 'winetricks' else None)
     mock_session = AsyncMock()
     mock_response = mocker.Mock()
     mock_response.content = b''
@@ -207,10 +191,8 @@ async def test_create_wine_prefix_dxvk_nvapi_true_no_q4wine_db(mocker: MockerFix
 
 async def test_create_wine_prefix_dxvk_nvapi_true_32bit(mocker: MockerFixture) -> None:
     mock_subprocess = _mock_async_subprocess(mocker)
-    mocker.patch(
-        'mkwineprefix.prefix.which',
-        side_effect=lambda x: '/usr/bin/winetricks' if x == 'winetricks' else None,
-    )
+    mocker.patch('mkwineprefix.prefix.which',
+                 side_effect=lambda x: '/usr/bin/winetricks' if x == 'winetricks' else None)
     mocker.patch('mkwineprefix.prefix.sqlite3')
     mock_session = AsyncMock()
     mock_response = mocker.Mock()
@@ -223,15 +205,12 @@ async def test_create_wine_prefix_dxvk_nvapi_true_32bit(mocker: MockerFixture) -
     mocker.patch('mkwineprefix.prefix.tarfile.TarFile')
     mocker.patch('mkwineprefix.prefix.copyfile')
     mocker.patch('mkwineprefix.prefix.struct.pack', return_value=b'\x00' * 92)
-    mocker.patch.dict(
-        'mkwineprefix.prefix.environ',
-        {
-            'PATH': '/bin',
-            'DISPLAY': ':0',
-            'XAUTHORITY': '/tmp/.Xauthority'
-        },
-        clear=True,
-    )
+    mocker.patch.dict('mkwineprefix.prefix.environ', {
+        'PATH': '/bin',
+        'DISPLAY': ':0',
+        'XAUTHORITY': '/tmp/.Xauthority'
+    },
+                      clear=True)
     mock_anyio_path_cls = _mock_anyio_path(mocker)
     mock_q4wine_path = mocker.Mock()
     mock_q4wine_path.exists = AsyncMock(return_value=False)
@@ -261,22 +240,18 @@ async def test_create_wine_prefix_dxvk_nvapi_true_32bit(mocker: MockerFixture) -
 
 async def test_create_wine_prefix_asio_true_register_found(mocker: MockerFixture) -> None:
     mock_subprocess = _mock_async_subprocess(mocker)
-    mocker.patch(
-        'mkwineprefix.prefix.which',
-        side_effect=lambda x: '/usr/bin/wineasio-register' if x == 'wineasio-register' else None,
-    )
+    mocker.patch('mkwineprefix.prefix.which',
+                 side_effect=lambda x: '/usr/bin/wineasio-register'
+                 if x == 'wineasio-register' else None)
     _mock_anyio_path(mocker)
     mock_path = mocker.patch('mkwineprefix.prefix.Path')
     mock_path.home.return_value.__truediv__.return_value = mock_path
-    mocker.patch.dict(
-        'mkwineprefix.prefix.environ',
-        {
-            'PATH': '/bin',
-            'DISPLAY': ':0',
-            'XAUTHORITY': '/tmp/.Xauthority'
-        },
-        clear=True,
-    )
+    mocker.patch.dict('mkwineprefix.prefix.environ', {
+        'PATH': '/bin',
+        'DISPLAY': ':0',
+        'XAUTHORITY': '/tmp/.Xauthority'
+    },
+                      clear=True)
     mocker.patch('mkwineprefix.prefix.niquests.AsyncSession')
     mocker.patch('mkwineprefix.prefix.xz.open')
     mocker.patch('mkwineprefix.prefix.tarfile.TarFile')
@@ -331,15 +306,12 @@ async def test_create_wine_prefix_q4wine_missing_row_id(mocker: MockerFixture) -
     mocker.patch('mkwineprefix.prefix.rmtree')
     mocker.patch('mkwineprefix.prefix.tempfile.gettempdir', return_value='/tmp')
     mocker.patch('mkwineprefix.prefix.struct.pack', return_value=b'\x00' * 92)
-    mocker.patch.dict(
-        'mkwineprefix.prefix.environ',
-        {
-            'PATH': '/bin',
-            'DISPLAY': ':0',
-            'XAUTHORITY': '/tmp/.Xauthority'
-        },
-        clear=True,
-    )
+    mocker.patch.dict('mkwineprefix.prefix.environ', {
+        'PATH': '/bin',
+        'DISPLAY': ':0',
+        'XAUTHORITY': '/tmp/.Xauthority'
+    },
+                      clear=True)
     with pytest.raises(RuntimeError, match='Q4Wine insert did not return a prefix row ID'):
         await create_wine_prefix('q4wine-bad-id')
 
@@ -351,15 +323,12 @@ async def test_create_wine_prefix_reg_failure(mocker: MockerFixture) -> None:
     mock_path = mocker.patch('mkwineprefix.prefix.Path')
     mock_path.home.return_value.__truediv__.return_value = mock_path
     mocker.patch('mkwineprefix.prefix.sqlite3')
-    mocker.patch.dict(
-        'mkwineprefix.prefix.environ',
-        {
-            'PATH': '/bin',
-            'DISPLAY': ':0',
-            'XAUTHORITY': '/tmp/.Xauthority'
-        },
-        clear=True,
-    )
+    mocker.patch.dict('mkwineprefix.prefix.environ', {
+        'PATH': '/bin',
+        'DISPLAY': ':0',
+        'XAUTHORITY': '/tmp/.Xauthority'
+    },
+                      clear=True)
     import subprocess as sp
     with pytest.raises(sp.CalledProcessError):
         await create_wine_prefix('reg-fail', dpi=120)
@@ -404,15 +373,12 @@ async def test_create_wine_prefix_q4wine_success(mocker: MockerFixture) -> None:
     mocker.patch('mkwineprefix.prefix.rmtree')
     mocker.patch('mkwineprefix.prefix.tempfile.gettempdir', return_value='/tmp')
     mocker.patch('mkwineprefix.prefix.struct.pack', return_value=b'\x00' * 92)
-    mocker.patch.dict(
-        'mkwineprefix.prefix.environ',
-        {
-            'PATH': '/bin',
-            'DISPLAY': ':0',
-            'XAUTHORITY': '/tmp/.Xauthority'
-        },
-        clear=True,
-    )
+    mocker.patch.dict('mkwineprefix.prefix.environ', {
+        'PATH': '/bin',
+        'DISPLAY': ':0',
+        'XAUTHORITY': '/tmp/.Xauthority'
+    },
+                      clear=True)
     result = await create_wine_prefix('q4wine-ok')
     assert result is not None
     assert mock_cursor.execute.call_count > 3

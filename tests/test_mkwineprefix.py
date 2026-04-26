@@ -37,10 +37,8 @@ def test_mkwineprefix_file_exists(mocker: MockerFixture, runner: CliRunner) -> N
 
 
 def test_mkwineprefix_subprocess_error(mocker: MockerFixture, runner: CliRunner) -> None:
-    mocker.patch(
-        'mkwineprefix.main.create_wine_prefix',
-        new_callable=AsyncMock,
-        side_effect=sp.CalledProcessError(1, 'cmd', stderr='err', output='out'),
-    )
+    mocker.patch('mkwineprefix.main.create_wine_prefix',
+                 new_callable=AsyncMock,
+                 side_effect=sp.CalledProcessError(1, 'cmd', stderr='err', output='out'))
     result = runner.invoke(main, ['test-prefix'])
     assert result.exit_code != 0

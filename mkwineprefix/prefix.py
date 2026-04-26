@@ -77,43 +77,18 @@ WINETRICKS_VERSION_MAPPING = {
     '81': 'win81',
     '2k': 'win2k',
     '98': 'win98',
-    '95': 'win95',
+    '95': 'win95'
 }
 _CREATE_WINE_PREFIX_NOTO_FONT_REPLACEMENTS = {
-    'Arial Baltic,186',
-    'Arial CE,238',
-    'Arial CYR,204',
-    'Arial Greek,161',
-    'Arial TUR,162',
-    'Courier New Baltic,186',
-    'Courier New CE,238',
-    'Courier New CYR,204',
-    'Courier New Greek,161',
-    'Courier New TUR,162',
-    'Helv',
-    'Helvetica',
-    'MS Shell Dlg',
-    'MS Shell Dlg 2',
-    'MS Sans Serif',
-    'Segoe UI',
-    'System',
-    'Tahoma',
-    'Times',
-    'Times New Roman Baltic,186',
-    'Times New Roman CE,238',
-    'Times New Roman CYR,204',
-    'Times New Roman Greek,161',
-    'Times New Roman TUR,162',
-    'Tms Rmn',
-    'Verdana',
+    'Arial Baltic,186', 'Arial CE,238', 'Arial CYR,204', 'Arial Greek,161', 'Arial TUR,162',
+    'Courier New Baltic,186', 'Courier New CE,238', 'Courier New CYR,204', 'Courier New Greek,161',
+    'Courier New TUR,162', 'Helv', 'Helvetica', 'MS Shell Dlg', 'MS Shell Dlg 2', 'MS Sans Serif',
+    'Segoe UI', 'System', 'Tahoma', 'Times', 'Times New Roman Baltic,186', 'Times New Roman CE,238',
+    'Times New Roman CYR,204', 'Times New Roman Greek,161', 'Times New Roman TUR,162', 'Tms Rmn',
+    'Verdana'
 }
 _CREATE_WINE_PREFIX_NOTO_REGISTRY_ENTRIES = {
-    'Caption',
-    'Icon',
-    'Menu',
-    'Message',
-    'SmCaption',
-    'Status',
+    'Caption', 'Icon', 'Menu', 'Message', 'SmCaption', 'Status'
 }
 
 
@@ -136,48 +111,23 @@ class LOGFONTW(NamedTuple):
 
 
 Q4WINE_DEFAULT_ICONS: tuple[tuple[str, str, str, str, str, str], ...] = (
-    ('', 'control.exe', 'control', 'Wine control panel', 'system', 'Control Panel'),
-    ('', 'eject.exe', 'eject', 'Wine CD eject tool', 'system', 'Eject'),
-    (
-        '',
-        'explorer.exe',
-        'explorer',
-        'Browse the files in the virtual Wine Drive',
-        'system',
-        'Explorer',
-    ),
-    ('', 'iexplore.exe', 'iexplore', 'Wine internet browser', 'system', 'Internet Explorer'),
-    ('', 'notepad.exe', 'notepad', 'Wine notepad text editor', 'system', 'Notepad'),
-    ('', 'oleview.exe', 'oleview', 'Wine OLE/COM object viewer', 'system', 'OLE Viewer'),
-    ('', 'regedit.exe', 'regedit', 'Wine registry editor', 'system', 'Registry Editor'),
-    ('', 'taskmgr.exe', 'taskmgr', 'Wine task manager', 'system', 'Task Manager'),
-    (
-        '',
-        'uninstaller.exe',
-        'uninstaller',
-        'Uninstall Windows programs under Wine properly',
-        'system',
-        'Uninstaller',
-    ),
-    (
-        '',
-        'winecfg.exe',
-        'winecfg',
-        'Configure the general settings for Wine',
-        'system',
-        'Configuration',
-    ),
-    (
-        '',
-        'wineconsole',
-        'wineconsole',
-        'Wineconsole is similar to wine command wcmd',
-        'system',
-        'Console',
-    ),
-    ('', 'winemine.exe', 'winemine', 'Wine sweeper game', 'system', 'Winemine'),
-    ('', 'wordpad.exe', 'wordpad', 'Wine wordpad text editor', 'system', 'WordPad'),
-)
+    ('', 'control.exe', 'control', 'Wine control panel', 'system',
+     'Control Panel'), ('', 'eject.exe', 'eject', 'Wine CD eject tool', 'system', 'Eject'),
+    ('', 'explorer.exe', 'explorer', 'Browse the files in the virtual Wine Drive', 'system',
+     'Explorer'), ('', 'iexplore.exe', 'iexplore', 'Wine internet browser', 'system',
+                   'Internet Explorer'), ('', 'notepad.exe', 'notepad', 'Wine notepad text editor',
+                                          'system', 'Notepad'),
+    ('', 'oleview.exe', 'oleview', 'Wine OLE/COM object viewer', 'system',
+     'OLE Viewer'), ('', 'regedit.exe', 'regedit', 'Wine registry editor', 'system',
+                     'Registry Editor'), ('', 'taskmgr.exe', 'taskmgr', 'Wine task manager',
+                                          'system', 'Task Manager'),
+    ('', 'uninstaller.exe', 'uninstaller', 'Uninstall Windows programs under Wine properly',
+     'system', 'Uninstaller'),
+    ('', 'winecfg.exe', 'winecfg', 'Configure the general settings for Wine', 'system',
+     'Configuration'), ('', 'wineconsole', 'wineconsole',
+                        'Wineconsole is similar to wine command wcmd', 'system', 'Console'),
+    ('', 'winemine.exe', 'winemine', 'Wine sweeper game', 'system',
+     'Winemine'), ('', 'wordpad.exe', 'wordpad', 'Wine wordpad text editor', 'system', 'WordPad'))
 
 
 def _build_prefix_env(target: Path, *, _32bit: bool = False) -> dict[str, str]:
@@ -188,7 +138,7 @@ def _build_prefix_env(target: Path, *, _32bit: bool = False) -> dict[str, str]:
         'PATH': environ['PATH'],
         'WINEPREFIX': str(target),
         'XAUTHORITY': environ.get('XAUTHORITY', ''),
-        'WINEDEBUG': environ.get('WINEDEBUG', 'fixme-all'),
+        'WINEDEBUG': environ.get('WINEDEBUG', 'fixme-all')
     }
     if arch:
         env['WINEARCH'] = environ.get('WINEARCH', arch)
@@ -197,35 +147,24 @@ def _build_prefix_env(target: Path, *, _32bit: bool = False) -> dict[str, str]:
     return env
 
 
-async def _apply_initial_registry(
-    env: dict[str, str],
-    dpi: int,
-    *,
-    dxva_vaapi: bool = False,
-    eax: bool = False,
-    gtk: bool = False,
-    winrt_dark: bool = False,
-    no_associations: bool = False,
-    no_xdg: bool = False,
-    no_mono: bool = False,
-    no_gecko: bool = False,
-    disable_explorer: bool = False,
-    disable_services: bool = False,
-) -> None:
+async def _apply_initial_registry(env: dict[str, str],
+                                  dpi: int,
+                                  *,
+                                  dxva_vaapi: bool = False,
+                                  eax: bool = False,
+                                  gtk: bool = False,
+                                  winrt_dark: bool = False,
+                                  no_associations: bool = False,
+                                  no_xdg: bool = False,
+                                  no_mono: bool = False,
+                                  no_gecko: bool = False,
+                                  disable_explorer: bool = False,
+                                  disable_services: bool = False) -> None:
     coros: list[Coroutine[Any, Any, None]] = []
     if dpi != DEFAULT_DPI:
         coros.append(
-            _run_reg(
-                env,
-                r'HKCU\Control Panel\Desktop',
-                '/t',
-                'REG_DWORD',
-                '/v',
-                'LogPixels',
-                '/d',
-                str(dpi),
-                '/f',
-            ))
+            _run_reg(env, r'HKCU\Control Panel\Desktop', '/t', 'REG_DWORD', '/v', 'LogPixels', '/d',
+                     str(dpi), '/f'))
     if dxva_vaapi:
         coros.append(_run_reg(env, r'HKCU\Software\Wine\DXVA2', '/v', 'backend', '/d', 'va', '/f'))
     if eax:
@@ -235,28 +174,13 @@ async def _apply_initial_registry(
         coros.append(_run_reg(env, r'HKCU\Software\Wine', '/v', 'ThemeEngine', '/d', 'GTK', '/f'))
     if winrt_dark:
         coros.extend(
-            _run_reg(
-                env,
-                r'HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize',
-                '/t',
-                'REG_DWORD',
-                '/v',
-                k,
-                '/d',
-                '0',
-                '/f',
-            ) for k in ('AppsUseLightTheme', 'SystemUsesLightTheme'))
+            _run_reg(env, r'HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize',
+                     '/t', 'REG_DWORD', '/v', k, '/d', '0', '/f')
+            for k in ('AppsUseLightTheme', 'SystemUsesLightTheme'))
     if no_associations:
         coros.append(
-            _run_reg(
-                env,
-                r'HKCU\Software\Wine\Explorer\FileAssociations',
-                '/v',
-                'Enable',
-                '/d',
-                'N',
-                '/f',
-            ))
+            _run_reg(env, r'HKCU\Software\Wine\Explorer\FileAssociations', '/v', 'Enable', '/d',
+                     'N', '/f'))
     if no_xdg:
         coros.append(
             _run_reg(env, r'HKCU\Software\Wine\DllOverrides', '/v', 'winemenubuilder.exe', '/f'))
@@ -276,39 +200,28 @@ async def _setup_tmpfs(target: Path) -> None:
     username = environ.get('USER', environ.get('USERNAME', 'user'))
     user_temp = target / f'drive_c/users/{username}/Temp'
     win_temp = target / 'drive_c/windows/temp'
-    await asyncio.gather(
-        run_in_thread(partial(rmtree, user_temp, ignore_errors=True)),
-        run_in_thread(partial(rmtree, win_temp, ignore_errors=True)),
-    )
+    await asyncio.gather(run_in_thread(partial(rmtree, user_temp, ignore_errors=True)),
+                         run_in_thread(partial(rmtree, win_temp, ignore_errors=True)))
     tmpdir = tempfile.gettempdir()
     await asyncio.gather(
         AsyncPath(user_temp).symlink_to(tmpdir, target_is_directory=True),
-        AsyncPath(win_temp).symlink_to(tmpdir, target_is_directory=True),
-    )
+        AsyncPath(win_temp).symlink_to(tmpdir, target_is_directory=True))
 
 
-async def _run_winetricks(
-    prefix_name: str,
-    tricks_list: list[str],
-    windows_version: WineWindowsVersion,
-    *,
-    sandbox: bool = False,
-    vd: str = 'off',
-) -> None:
+async def _run_winetricks(prefix_name: str,
+                          tricks_list: list[str],
+                          windows_version: WineWindowsVersion,
+                          *,
+                          sandbox: bool = False,
+                          vd: str = 'off') -> None:
     tricks_list.append(WINETRICKS_VERSION_MAPPING[windows_version])
     if sandbox:
         tricks_list += ['isolate_home', 'sandbox']
     if vd != 'off':
         tricks_list.append(f'vd={vd}')
     if winetricks := await run_in_thread(partial(which, 'winetricks')):
-        cmd = (
-            winetricks,
-            '--force',
-            '--country=US',
-            '--unattended',
-            f'prefix={prefix_name}',
-            *sorted(set(tricks_list)),
-        )
+        cmd = (winetricks, '--force', '--country=US', '--unattended', f'prefix={prefix_name}',
+               *sorted(set(tricks_list)))
         await _run_cmd(cmd)
 
 
@@ -323,8 +236,7 @@ async def _setup_dxvk_nvapi(target: Path,
     prefix_tar = f'{nvidia_libs}-{version}'
     r = await session.get(
         f'https://github.com/SveSop/{nvidia_libs}/releases/download/v{version}/{prefix_tar}.tar.xz',
-        timeout=15,
-    )
+        timeout=15)
     r.raise_for_status()
     content = r.content or b''
     with xz.open(BytesIO(content)) as xz_file, tarfile.TarFile(fileobj=xz_file) as tar:
@@ -338,97 +250,63 @@ async def _setup_dxvk_nvapi(target: Path,
             *(_run_reg(env, r'HKCU\Software\Wine\DllOverrides', '/v', item, '/d', 'native', '/f')
               for item in x32_items))
         if not _32bit:
-            x64_items = (
-                'nvcuda',
-                'nvoptix',
-                'nvcuvid',
-                'nvencodeapi64',
-                'nvapi64',
-                'nvofapi64',
-            )
+            x64_items = ('nvcuda', 'nvoptix', 'nvcuvid', 'nvencodeapi64', 'nvapi64', 'nvofapi64')
             for item in x64_items:
                 member = tar.getmember(f'{prefix_tar}/x64/{item}.dll')
                 member.name = f'{item}.dll'
                 await run_in_thread(
                     partial(tar.extract, member, target / 'drive_c' / 'windows' / 'system32'))
-            await asyncio.gather(*(_run_reg(
-                env,
-                r'HKCU\Software\Wine\DllOverrides',
-                '/v',
-                item,
-                '/d',
-                'native',
-                '/f',
-                wine_bin='wine64',
-            ) for item in x64_items))
+            await asyncio.gather(*(_run_reg(env,
+                                            r'HKCU\Software\Wine\DllOverrides',
+                                            '/v',
+                                            item,
+                                            '/d',
+                                            'native',
+                                            '/f',
+                                            wine_bin='wine64') for item in x64_items))
     await asyncio.gather(*(run_in_thread(
-        partial(
-            copyfile,
-            f'/lib64/nvidia/wine/{pfx}nvngx.dll',
-            target / 'drive_c' / 'windows' / 'system32' / f'{pfx}nvngx.dll',
-        )) for pfx in ('', '_')))
+        partial(copyfile, f'/lib64/nvidia/wine/{pfx}nvngx.dll', target / 'drive_c' / 'windows' /
+                'system32' / f'{pfx}nvngx.dll')) for pfx in ('', '_')))
     if not _32bit:
-        await _run_reg(
-            env,
-            r'HKLM\Software\NVIDIA Corporation\Global\NGXCore',
-            '/t',
-            'REG_SZ',
-            '/v',
-            'FullPath',
-            '/d',
-            r'C:\Windows\system32',
-            '/f',
-            wine_bin='wine64',
-        )
+        await _run_reg(env,
+                       r'HKLM\Software\NVIDIA Corporation\Global\NGXCore',
+                       '/t',
+                       'REG_SZ',
+                       '/v',
+                       'FullPath',
+                       '/d',
+                       r'C:\Windows\system32',
+                       '/f',
+                       wine_bin='wine64')
 
 
 async def _apply_noto_sans(env: dict[str, str]) -> None:
-    await asyncio.gather(*(_run_reg(
-        env,
-        r'HKLM\Software\Microsoft\Windows NT\CurrentVersion\FontSubstitutes',
-        '/t',
-        'REG_SZ',
-        '/v',
-        font_name,
-        '/d',
-        'Noto Sans',
-        '/f',
-    ) for font_name in _CREATE_WINE_PREFIX_NOTO_FONT_REPLACEMENTS))
+    await asyncio.gather(
+        *(_run_reg(env, r'HKLM\Software\Microsoft\Windows NT\CurrentVersion\FontSubstitutes', '/t',
+                   'REG_SZ', '/v', font_name, '/d', 'Noto Sans', '/f')
+          for font_name in _CREATE_WINE_PREFIX_NOTO_FONT_REPLACEMENTS))
     face_name = 'Noto Sans'.encode('utf-16le').ljust(LF_FULLFACESIZE, b'\0')
     coros: list[Coroutine[Any, Any, None]] = []
     for entry_name in _CREATE_WINE_PREFIX_NOTO_REGISTRY_ENTRIES:
         weight = Weight.FW_BOLD if entry_name == 'Caption' else Weight.FW_NORMAL
         packed = struct.pack(
             '=5l8B64B',
-            *LOGFONTW(
-                lfHeight=-12,
-                lfWidth=0,
-                lfEscapement=0,
-                lfOrientation=0,
-                lfWeight=weight,
-                lfItalic=False,
-                lfUnderline=False,
-                lfStrikeOut=False,
-                lfCharSet=CharacterSet.DEFAULT_CHARSET,
-                lfOutPrecision=OutputPrecision.OUT_DEFAULT_PRECIS,
-                lfClipPrecision=ClipPrecision.CLIP_DEFAULT_PRECIS,
-                lfQuality=Quality.DEFAULT_QUALITY,
-                lfPitchAndFamily=Pitch.VARIABLE_PITCH | Family.FF_SWISS,
-            ),
-            *face_name,
-        )
+            *LOGFONTW(lfHeight=-12,
+                      lfWidth=0,
+                      lfEscapement=0,
+                      lfOrientation=0,
+                      lfWeight=weight,
+                      lfItalic=False,
+                      lfUnderline=False,
+                      lfStrikeOut=False,
+                      lfCharSet=CharacterSet.DEFAULT_CHARSET,
+                      lfOutPrecision=OutputPrecision.OUT_DEFAULT_PRECIS,
+                      lfClipPrecision=ClipPrecision.CLIP_DEFAULT_PRECIS,
+                      lfQuality=Quality.DEFAULT_QUALITY,
+                      lfPitchAndFamily=Pitch.VARIABLE_PITCH | Family.FF_SWISS), *face_name)
         coros.append(
-            _run_reg(
-                env,
-                r'HKCU\Control Panel\Desktop\WindowMetrics',
-                '/t',
-                'REG_BINARY',
-                '/v',
-                f'{entry_name}Font',
-                '/d',
-                ''.join(f'{x:02x}' for x in packed),
-                '/f',
-            ))
+            _run_reg(env, r'HKCU\Control Panel\Desktop\WindowMetrics', '/t', 'REG_BINARY', '/v',
+                     f'{entry_name}Font', '/d', ''.join(f'{x:02x}' for x in packed), '/f'))
     await asyncio.gather(*coros)
 
 
@@ -446,9 +324,7 @@ async def _add_q4wine_prefix(prefix_name: str, target: Path) -> None:
             c = conn.cursor()
             c.execute(
                 'INSERT INTO prefix (name, path, mountpoint_windrive, run_string, version_id) '
-                'VALUES (?, ?, ?, ?, 1)',
-                (prefix_name, str(target), 'D:', run_string),
-            )
+                'VALUES (?, ?, ?, ?, 1)', (prefix_name, str(target), 'D:', run_string))
             prefix_id = c.lastrowid
             if prefix_id is None:
                 msg = 'Q4Wine insert did not return a prefix row ID.'
@@ -464,48 +340,36 @@ async def _add_q4wine_prefix(prefix_name: str, target: Path) -> None:
         ?, ?, ?, ?, (
             SELECT id FROM dir WHERE name = ? AND prefix_id = ?
         ), ?, ?, 0
-    )""",
-                    (
-                        args or None,
-                        exec_,
-                        icon_path,
-                        desc,
-                        folder,
-                        prefix_id,
-                        display_name,
-                        prefix_id,
-                    ),
-                )
+    )""", (args or None, exec_, icon_path, desc, folder, prefix_id, display_name, prefix_id))
             c.execute('DELETE FROM logging WHERE prefix_id = ?', (prefix_id,))
 
     await run_in_thread(_do_q4wine_insert)
 
 
 async def create_wine_prefix(  # noqa: PLR0913
-    prefix_name: str,
-    *,
-    _32bit: bool = False,
-    asio: bool = False,
-    disable_explorer: bool = False,
-    disable_services: bool = False,
-    dpi: int = DEFAULT_DPI,
-    dxva_vaapi: bool = False,
-    dxvk_nvapi: bool = False,
-    eax: bool = False,
-    gtk: bool = False,
-    no_associations: bool = False,
-    no_gecko: bool = False,
-    no_mono: bool = False,
-    no_xdg: bool = False,
-    noto_sans: bool = False,
-    prefix_root: StrPath | None = None,
-    sandbox: bool = False,
-    tmpfs: bool = False,
-    tricks: Iterable[str] | None = None,
-    vd: str = 'off',
-    windows_version: WineWindowsVersion = '10',
-    winrt_dark: bool = False,
-) -> Path:
+        prefix_name: str,
+        *,
+        _32bit: bool = False,
+        asio: bool = False,
+        disable_explorer: bool = False,
+        disable_services: bool = False,
+        dpi: int = DEFAULT_DPI,
+        dxva_vaapi: bool = False,
+        dxvk_nvapi: bool = False,
+        eax: bool = False,
+        gtk: bool = False,
+        no_associations: bool = False,
+        no_gecko: bool = False,
+        no_mono: bool = False,
+        no_xdg: bool = False,
+        noto_sans: bool = False,
+        prefix_root: StrPath | None = None,
+        sandbox: bool = False,
+        tmpfs: bool = False,
+        tricks: Iterable[str] | None = None,
+        vd: str = 'off',
+        windows_version: WineWindowsVersion = '10',
+        winrt_dark: bool = False) -> Path:
     """
     Create a Wine prefix with custom settings.
 
@@ -583,20 +447,18 @@ async def create_wine_prefix(  # noqa: PLR0913
     await _run_cmd(('wineboot', '--init'), env)
     await _run_cmd(('wineserver', '-w'), env)
     coros: list[Coroutine[Any, Any, None]] = [
-        _apply_initial_registry(
-            env,
-            dpi,
-            disable_explorer=disable_explorer,
-            disable_services=disable_services,
-            dxva_vaapi=dxva_vaapi,
-            eax=eax,
-            gtk=gtk,
-            no_associations=no_associations,
-            no_gecko=no_gecko,
-            no_mono=no_mono,
-            no_xdg=no_xdg,
-            winrt_dark=winrt_dark,
-        )
+        _apply_initial_registry(env,
+                                dpi,
+                                disable_explorer=disable_explorer,
+                                disable_services=disable_services,
+                                dxva_vaapi=dxva_vaapi,
+                                eax=eax,
+                                gtk=gtk,
+                                no_associations=no_associations,
+                                no_gecko=no_gecko,
+                                no_mono=no_mono,
+                                no_xdg=no_xdg,
+                                winrt_dark=winrt_dark)
     ]
     if tmpfs:
         coros.append(_setup_tmpfs(target))
