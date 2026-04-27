@@ -9,6 +9,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [unreleased]
 
+## [0.1.0] - 2026-04-26
+
+### Added
+
+- Man page for `mkwineprefix`.
+
 ### Changed
 
 - Switched HTTP library from `requests` to `niquests`.
@@ -27,5 +33,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 First version, migrated from Deltona.
 
-[unreleased]: https://github.com/Tatsh/mkwineprefix/compare/v0.0.1...HEAD
+[unreleased]: https://github.com/Tatsh/mkwineprefix/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/Tatsh/mkwineprefix/compare/v0.0.1...v0.1.0
 [0.0.1]: https://github.com/Tatsh/mkwineprefix/releases/tag/v0.0.1
