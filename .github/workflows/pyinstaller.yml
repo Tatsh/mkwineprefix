@@ -1,7 +1,6 @@
 jobs:
   build:
     env:
-      WINDOWS_SIGNING_CERT: ${{ secrets.WINDOWS_SIGNING_CERTIFICATE }}
       APPLE_SIGNING_CERT: ${{ secrets.APPLE_SIGNING_CERTIFICATE }}
     runs-on: ${{ matrix.os }}
     steps:
@@ -77,36 +76,6 @@ jobs:
               fi
           done < <(tomlq -r '.project.scripts|to_entries[]|"\(.key) \(.value|split(":")|join(" "))"' pyproject.toml)
         shell: 'bash'
-      - if: (matrix.os == 'windows-latest' || matrix.os == 'windows-11-arm') && env.WINDOWS_SIGNING_CERT != ''
-        name: 'Sign Windows binaries'
-        env:
-          SIGNING_CERT_BASE64: ${{ secrets.WINDOWS_SIGNING_CERTIFICATE }}
-          SIGNING_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
-          TIMESTAMP_URL: ${{ secrets.WINDOWS_TIMESTAMP_URL }}
-        run: |
-          $certBytes = [Convert]::FromBase64String($env:SIGNING_CERT_BASE64)
-          $certPath = Join-Path $env:RUNNER_TEMP 'cert.pfx'
-          [IO.File]::WriteAllBytes($certPath, $certBytes)
-          $timestampArgs = @()
-          if ($env:TIMESTAMP_URL) {
-            $timestampArgs = @('/tr', $env:TIMESTAMP_URL, '/td', 'sha256')
-          }
-          foreach ($exe in (Get-ChildItem -Path dist\*.exe)) {
-            Write-Host "Signing '$($exe.Name)'..."
-            & signtool sign /f $certPath /p $env:SIGNING_PASSWORD @timestampArgs /fd sha256 $exe.FullName
-            if ($LASTEXITCODE -ne 0) { throw "signtool failed for $($exe.Name)" }
-          }
-          Remove-Item $certPath
-        shell: 'pwsh'
-      - if: matrix.os == 'windows-latest' || matrix.os == 'windows-11-arm'
-        name: 'Test binary'
-        run: |
-          $distFiles = Get-ChildItem -Path dist\*.exe
-          Write-Host "Found $($distFiles.Count) files in dist/: $(( $distFiles | ForEach-Object { $_.Name } ) -join ', ')"
-          foreach ($file in $distFiles) {
-            Write-Host "Testing '$($file.FullName)'."
-            & $file.FullName --help
-          }
       - if: (matrix.os == 'macos-latest' || matrix.os == 'macos-15-intel') && env.APPLE_SIGNING_CERT != ''
         name: 'Sign and notarise macOS binaries'
         env:
@@ -194,13 +163,6 @@ jobs:
           rm -fR _out
           mkdir _out
           zip -j _out/mkwineprefix-${{ github.ref_name }}-${{ matrix.suffix }}.zip ${{ matrix.dist_path }}
-      - if: (matrix.os == 'windows-latest' || matrix.os == 'windows-11-arm') && github.ref_type == 'tag'
-        name: 'Zip files'
-        run: |
-          Remove-Item -Force _out -ErrorAction Continue
-          New-Item -ItemType Directory -Name _out
-          Compress-Archive -Path ${{ matrix.dist_path }} -DestinationPath _out/mkwineprefix-${{ github.ref_name }}-${{ matrix.suffix }}.zip
-        shell: pwsh
       - if: github.ref_type == 'tag'
         name: 'Attest'
         uses: 'actions/attest@v4.1.0'
@@ -229,12 +191,6 @@ jobs:
           - os: 'macos-latest'
             dist_path: 'dist/*'
             suffix: 'mac-arm64'
-          - os: 'windows-latest'
-            dist_path: 'dist/*.exe'
-            suffix: 'win-x86_64'
-          - os: 'windows-11-arm'
-            dist_path: 'dist/*.exe'
-            suffix: 'win-arm64'
 name: 'PyInstaller'
 'on':
   push:

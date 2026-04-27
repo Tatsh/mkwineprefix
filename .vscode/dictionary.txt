@@ -65,7 +65,6 @@ jinja
 jsonnet
 jsonschema
 kwargs
-lastexitcode
 lastrowid
 launchable
 lextudio
@@ -91,7 +90,6 @@ notarytool
 noto
 npmjs
 numpy
-numpydoc
 nvapi
 nvcuda
 nvcuvid
@@ -130,7 +128,6 @@ segoe
 setattr
 shellcheck
 shellformat
-signtool
 snapcore
 snapcraft
 softprops
