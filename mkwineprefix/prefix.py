@@ -36,7 +36,7 @@ from ._windows import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Coroutine, Iterable
+    from collections.abc import Coroutine, Iterable, Mapping
 
 __all__ = ('create_wine_prefix',)
 
@@ -44,7 +44,7 @@ StrPath: TypeAlias = str | PathLike[str]
 log = logging.getLogger(__name__)
 
 
-async def _run_reg(env: dict[str, str], *args: str, wine_bin: str = 'wine') -> None:
+async def _run_reg(env: Mapping[str, str], *args: str, wine_bin: str = 'wine') -> None:
     cmd = (wine_bin, 'reg', 'add', *args)
     log.debug('Running: %s', ' '.join(quote(x) for x in cmd))
     proc = await asyncio.create_subprocess_exec(*cmd, env=env)
@@ -53,7 +53,7 @@ async def _run_reg(env: dict[str, str], *args: str, wine_bin: str = 'wine') -> N
         raise sp.CalledProcessError(returncode, cmd[0])
 
 
-async def _run_cmd(cmd: tuple[str, ...], env: dict[str, str] | None = None) -> None:
+async def _run_cmd(cmd: tuple[str, ...], env: Mapping[str, str] | None = None) -> None:
     log.debug('Running: %s', ' '.join(quote(x) for x in cmd))
     proc = await asyncio.create_subprocess_exec(*cmd, env=env)
     returncode = await proc.wait()
@@ -147,7 +147,7 @@ def _build_prefix_env(target: Path, *, _32bit: bool = False) -> dict[str, str]:
     return env
 
 
-async def _apply_initial_registry(env: dict[str, str],
+async def _apply_initial_registry(env: Mapping[str, str],
                                   dpi: int,
                                   *,
                                   dxva_vaapi: bool = False,
@@ -209,24 +209,22 @@ async def _setup_tmpfs(target: Path) -> None:
 
 
 async def _run_winetricks(prefix_name: str,
-                          tricks_list: list[str],
+                          tricks: Iterable[str],
                           windows_version: WineWindowsVersion,
                           *,
                           sandbox: bool = False,
                           vd: str = 'off') -> None:
-    tricks_list.append(WINETRICKS_VERSION_MAPPING[windows_version])
-    if sandbox:
-        tricks_list += ['isolate_home', 'sandbox']
-    if vd != 'off':
-        tricks_list.append(f'vd={vd}')
+    final_tricks = (*tricks, WINETRICKS_VERSION_MAPPING[windows_version],
+                    *(('isolate_home', 'sandbox') if sandbox else
+                      ()), *((f'vd={vd}',) if vd != 'off' else ()))
     if winetricks := await run_in_thread(partial(which, 'winetricks')):
         cmd = (winetricks, '--force', '--country=US', '--unattended', f'prefix={prefix_name}',
-               *sorted(set(tricks_list)))
+               *sorted(set(final_tricks)))
         await _run_cmd(cmd)
 
 
 async def _setup_dxvk_nvapi(target: Path,
-                            env: dict[str, str],
+                            env: Mapping[str, str],
                             session: niquests.AsyncSession,
                             *,
                             _32bit: bool = False) -> None:
@@ -280,7 +278,7 @@ async def _setup_dxvk_nvapi(target: Path,
                        wine_bin='wine64')
 
 
-async def _apply_noto_sans(env: dict[str, str]) -> None:
+async def _apply_noto_sans(env: Mapping[str, str]) -> None:
     await asyncio.gather(
         *(_run_reg(env, r'HKLM\Software\Microsoft\Windows NT\CurrentVersion\FontSubstitutes', '/t',
                    'REG_SZ', '/v', font_name, '/d', 'Noto Sans', '/f')
@@ -432,9 +430,9 @@ async def create_wine_prefix(  # noqa: PLR0913
     FileExistsError
         If the prefix directory already exists.
     """
-    tricks_list = list((t for t in tricks
-                        if t not in WINETRICKS_VERSION_MAPPING.values() and not t.startswith('vd=')
-                        ) if tricks else [])
+    filtered_tricks = tuple(
+        t for t in (tricks or ())
+        if t not in WINETRICKS_VERSION_MAPPING.values() and not t.startswith('vd='))
     root = Path(prefix_root) if prefix_root else Path.home() / '.local/share/wineprefixes'
     await AsyncPath(root).mkdir(parents=True, exist_ok=True)
     target = root / prefix_name
@@ -463,10 +461,9 @@ async def create_wine_prefix(  # noqa: PLR0913
     if tmpfs:
         coros.append(_setup_tmpfs(target))
     await asyncio.gather(*coros)
-    if dxvk_nvapi:
-        tricks_list.append('dxvk')
+    final_tricks = (*filtered_tricks, *(('dxvk',) if dxvk_nvapi else ()))
     try:
-        await _run_winetricks(prefix_name, tricks_list, windows_version, sandbox=sandbox, vd=vd)
+        await _run_winetricks(prefix_name, final_tricks, windows_version, sandbox=sandbox, vd=vd)
     except sp.CalledProcessError as e:  # pragma: no cover
         log.warning('Winetricks exit code was %d but it may have succeeded.', e.returncode)
     if dxvk_nvapi:
