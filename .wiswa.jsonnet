@@ -10,6 +10,7 @@ local utils = import 'utils.libjsonnet';
   want_main: true,
   want_flatpak: true,
   publishing+: { flathub: 'sh.tat.mkwineprefix' },
+  security_policy_supported_versions: { '0.1.x': ':white_check_mark:' },
   python_deps+: {
     tests+: {
       'pytest-asyncio': utils.latestPypiPackageVersionCaret('pytest-asyncio'),
