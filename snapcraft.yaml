@@ -20,7 +20,9 @@ parts:
     plugin: 'python'
     python-packages:
       - '.'
-    source: '.'
+    source: 'https://github.com/Tatsh/mkwineprefix.git'
+    source-tag: 'v0.1.1'
+    source-type: 'git'
     stage-packages: []
 platforms:
   amd64:
@@ -30,5 +32,5 @@ platforms:
 source-code: 'https://github.com/Tatsh/mkwineprefix'
 summary: 'Create a Wine prefix with custom settings.'
 title: 'mkwineprefix'
-version: '0.1.0'
+version: '0.1.1'
 website: 'https://tatsh.github.io/mkwineprefix/'
