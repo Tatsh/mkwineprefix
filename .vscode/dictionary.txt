@@ -52,6 +52,7 @@ fullfacesize
 functools
 genindex
 globaltoc
+handoff
 helv
 hkcu
 hklm
@@ -133,6 +134,7 @@ snapcraft
 softprops
 soupsieve
 sphinxcontrib
+statusline
 syft
 syswow
 tahoma
