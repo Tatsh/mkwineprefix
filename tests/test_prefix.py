@@ -133,7 +133,6 @@ async def test_create_wine_prefix_handles_winetricks_failure(mocker: MockerFixtu
     _mock_anyio_path(mocker)
     mock_path = mocker.patch('mkwineprefix.prefix.Path')
     mock_path.home.return_value.__truediv__.return_value = mock_path
-    mocker.patch('mkwineprefix.prefix.logging.getLogger', return_value=mocker.Mock())
     mocker.patch.dict('mkwineprefix.prefix.environ', {
         'PATH': '/bin',
         'DISPLAY': ':0',
