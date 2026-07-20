@@ -1,4 +1,4 @@
-# ruff: noqa: S108
+# ruff:file-ignore[hardcoded-temp-file]
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
@@ -17,7 +17,8 @@ def _mock_async_subprocess(mocker: MockerFixture,
                            *,
                            fail_cmds: frozenset[str] = _EMPTY_FAIL_CMDS) -> AsyncMock:
     """Set up a mock for ``asyncio.create_subprocess_exec``."""
-    async def _create_subprocess(*args: Any, **_kwargs: Any) -> AsyncMock:  # noqa: RUF029
+    async def _create_subprocess(*args: Any,
+                                 **_kwargs: Any) -> AsyncMock:  # ruff:ignore[unused-async]
         proc = AsyncMock()
         proc.wait.return_value = 1 if args and args[0] in fail_cmds else 0
         return proc
