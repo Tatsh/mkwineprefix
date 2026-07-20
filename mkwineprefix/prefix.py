@@ -1,5 +1,5 @@
 """Create a Wine prefix with custom settings."""
-# ruff: noqa: N815
+# ruff:file-ignore[mixed-case-variable-in-class-scope]
 
 from __future__ import annotations
 
@@ -344,7 +344,7 @@ async def _add_q4wine_prefix(prefix_name: str, target: Path) -> None:
     await run_in_thread(_do_q4wine_insert)
 
 
-async def create_wine_prefix(  # noqa: PLR0913
+async def create_wine_prefix(  # ruff:ignore[too-many-arguments]
         prefix_name: str,
         *,
         _32bit: bool = False,
