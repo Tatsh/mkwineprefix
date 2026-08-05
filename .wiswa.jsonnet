@@ -1,6 +1,7 @@
 local utils = import 'utils.libjsonnet';
 
 {
+  local top = self,
   uses_user_defaults: true,
   description: 'Create a Wine prefix with custom settings.',
   supported_platforms: ['linux', 'macos'],
@@ -35,9 +36,9 @@ local utils = import 'utils.libjsonnet';
   },
   snapcraft+: {
     parts+: {
-      [self.project_name]+: {
-        source: '%s.git' % self.repository_uri,
-        'source-tag': 'v%s' % self.version,
+      [top.project_name]+: {
+        source: '%s.git' % top.repository_uri,
+        'source-tag': 'v%s' % top.version,
         'source-type': 'git',
       },
     },

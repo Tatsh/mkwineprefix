@@ -89,7 +89,6 @@ niquests
 norecursedirs
 notarytool
 noto
-npmjs
 numpy
 nvapi
 nvcuda
@@ -106,6 +105,7 @@ pavelzw
 pipx
 platformdirs
 plistlib
+preapproved
 proc
 prodvers
 pycache
@@ -131,7 +131,6 @@ shellcheck
 shellformat
 snapcore
 snapcraft
-softprops
 soupsieve
 sphinxcontrib
 statusline
@@ -151,6 +150,8 @@ tryfirst
 ubyte
 udvare
 ultrabold
+undraft
+undrafted
 vaapi
 vendored
 venv
@@ -171,13 +172,16 @@ wineprefix
 wineprefixes
 wineserver
 winetricks
+winget
 winrt
 winxp
 wiswa
 wiswa's
 wordpad
+worktree
 xauthority
 xcrun
 yapf
 yapfignore
 yarnrc
+zizmor
