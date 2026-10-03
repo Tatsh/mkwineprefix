@@ -4,8 +4,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from unittest.mock import AsyncMock
 
-from mkwineprefix.prefix import create_wine_prefix
 import pytest
+
+from mkwineprefix.prefix import create_wine_prefix
 
 if TYPE_CHECKING:
     from pytest_mock import MockerFixture

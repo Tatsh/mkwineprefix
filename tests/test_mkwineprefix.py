@@ -4,8 +4,9 @@ from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock
 import subprocess as sp
 
-from mkwineprefix.main import main
 import pytest
+
+from mkwineprefix.main import main
 
 if TYPE_CHECKING:
     from pathlib import Path
