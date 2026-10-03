@@ -1,5 +1,4 @@
 anchore
-Ångström
 anyio
 appdir
 appimage
@@ -9,6 +8,7 @@ assocs
 asyncio
 autodoc
 automodule
+autouse
 bascom
 bsky
 cdrommsf
@@ -17,7 +17,6 @@ codesign
 colorlog
 commitizen
 conftest
-cooldown
 corefonts
 coros
 coveragerc
@@ -38,6 +37,7 @@ dxva
 dxvk
 eeyore
 elif
+endswith
 esac
 esbenp
 esbonio
@@ -59,7 +59,6 @@ hklm
 hoverxref
 htmlcov
 iexplore
-intersphinx
 isort
 itertools
 jinja
@@ -86,10 +85,14 @@ myproject
 mypy
 namedtuples
 niquests
+noone
+noqa
 norecursedirs
 notarytool
 noto
+nullglob
 numpy
+numpydoc
 nvapi
 nvcuda
 nvcuvid
@@ -105,6 +108,7 @@ pavelzw
 pipx
 platformdirs
 plistlib
+popen
 preapproved
 proc
 prodvers
@@ -123,12 +127,14 @@ regedit
 regen
 ripgreprc
 rstcheck
+sbclaude
 schemafile
 sdist
 segoe
 setattr
 shellcheck
 shellformat
+shopt
 snapcore
 snapcraft
 soupsieve
@@ -178,10 +184,10 @@ winxp
 wiswa
 wiswa's
 wordpad
-worktree
 xauthority
 xcrun
 yapf
 yapfignore
 yarnrc
 zizmor
+Ångström
