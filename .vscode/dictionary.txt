@@ -70,6 +70,7 @@ launchable
 lextudio
 libera
 libjsonnet
+librsvg
 libsonnet
 linters
 logfontw
@@ -127,6 +128,7 @@ regedit
 regen
 ripgreprc
 rstcheck
+rsvg
 sbclaude
 schemafile
 sdist
